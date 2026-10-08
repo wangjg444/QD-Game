@@ -1,0 +1,1559 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>前端宇宙 · 知识闯关 FRONTEND GALAXY - 免费在线前端学习游戏</title>
+<meta name="description" content="太空像素风前端知识闯关游戏：驾驶飞船穿越 12 个星域，挑战 72 道 HTML / CSS / JavaScript 选择题。AI 领航员小C 全程讲解，答对发射激光消灭 Bug 怪兽，答错显示解析与口诀。免费在线玩，无需安装，从零学前端。">
+<meta name="keywords" content="前端学习游戏,前端知识闯关,HTML游戏,CSS游戏,JavaScript游戏,前端入门,学前端,编程游戏,像素游戏,答题游戏,免费在线游戏,web开发学习">
+<meta name="author" content="wangjg444">
+<meta name="theme-color" content="#05060f">
+<link rel="canonical" href="https://wangjg444.github.io/QD-Game/">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<!-- Open Graph：社交平台分享卡片 -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="前端宇宙 FRONTEND GALAXY">
+<meta property="og:title" content="前端宇宙 · 知识闯关 FRONTEND GALAXY">
+<meta property="og:description" content="驾驶像素飞船穿越 12 星域，用激光消灭 72 只 Bug 怪兽！边玩边学前端：HTML / CSS / JavaScript 通关式学习，AI 领航员小C 全程讲解。">
+<meta property="og:url" content="https://wangjg444.github.io/QD-Game/">
+<meta property="og:image" content="https://wangjg444.github.io/QD-Game/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="zh_CN">
+<!-- Twitter 卡片 -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="前端宇宙 · 知识闯关 FRONTEND GALAXY">
+<meta name="twitter:description" content="驾驶像素飞船穿越 12 星域，用激光消灭 72 只 Bug 怪兽！边玩边学前端：HTML / CSS / JavaScript 通关式学习。">
+<meta name="twitter:image" content="https://wangjg444.github.io/QD-Game/og-image.png">
+<!-- 结构化数据：帮助搜索引擎理解这是一个可玩的游戏 -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "前端宇宙 · 知识闯关 FRONTEND GALAXY",
+  "description": "太空像素风前端知识闯关游戏。12 个星域关卡对应 12 个前端知识主题，72 道 HTML / CSS / JavaScript 选择题，AI 领航员全程讲解，边玩边学前端。",
+  "url": "https://wangjg444.github.io/QD-Game/",
+  "image": "https://wangjg444.github.io/QD-Game/og-image.png",
+  "genre": ["Educational", "Quiz", "Pixel Graphics", "Shoot 'em up"],
+  "gamePlatform": ["Web Browser", "Desktop"],
+  "applicationCategory": "Game",
+  "operatingSystem": "Any",
+  "playMode": "SinglePlayer",
+  "inLanguage": "zh-CN",
+  "author": {"@type": "Person", "name": "wangjg444"},
+  "offers": {"@type": "Offer", "price": "0", "priceCurrency": "CNY"},
+  "educationalLevel": "Beginner"
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+/* ============ 基础 ============ */
+*{margin:0;padding:0;box-sizing:border-box;user-select:none;}
+html,body{width:100%;height:100%;overflow:hidden;background:#000;}
+body{
+  font-family:'Press Start 2P','SimSun','NSimSun',monospace;
+  color:#e8f2ff;
+}
+/* 舞台：固定 960x600 逻辑分辨率，按窗口等比缩放 */
+#stage{
+  position:absolute;left:50%;top:50%;
+  width:960px;height:600px;
+  transform-origin:center;
+  background:#05060f;overflow:hidden;
+  box-shadow:0 0 80px rgba(0,240,255,.12);
+}
+#cv{position:absolute;inset:0;width:960px;height:600px;image-rendering:pixelated;}
+/* ============ CRT 扫描线效果 ============ */
+#crt{position:absolute;inset:0;z-index:90;pointer-events:none;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.22) 0 1px,transparent 1px 3px);}
+#crt::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,12,.55) 100%);}
+#crt::after{content:'';position:absolute;left:0;right:0;height:100px;top:-100px;
+  background:linear-gradient(180deg,transparent,rgba(160,220,255,.06),transparent);
+  animation:crtmove 7s linear infinite;}
+@keyframes crtmove{to{transform:translateY(800px);}}
+/* ============ HUD ============ */
+#hud{position:absolute;top:10px;left:12px;right:12px;z-index:20;display:none;align-items:center;gap:10px;font-size:11px;}
+#hud.show{display:flex;}
+.hud-chip{background:rgba(6,10,28,.88);border:2px solid #1c3355;padding:7px 10px;display:flex;align-items:center;gap:8px;box-shadow:0 0 0 2px #05060f;line-height:1;}
+.lbl{color:#6f9cc9;font-size:10px;}
+#hud-hp{display:flex;gap:3px;}
+#hud-hp i{width:30px;height:11px;background:#173257;border:1px solid #2c4f7d;}
+#hud-hp i.on{background:#3dff8f;box-shadow:0 0 8px rgba(61,255,143,.7);}
+#hud-hp i.on.low{background:#ffd24d;box-shadow:0 0 8px rgba(255,210,77,.7);}
+#hud-hp i.on.crit{background:#ff4060;box-shadow:0 0 8px rgba(255,64,96,.7);}
+#hud-score{color:#ffe14d;letter-spacing:1px;}
+#hud-micon{width:30px;height:22px;image-rendering:pixelated;}
+#hud-en{color:#ff9fc4;}
+#hud-lv{color:#7fe0ff;}
+/* ============ 答题面板 ============ */
+#qpanel{
+  position:absolute;left:50%;bottom:22px;
+  transform:translateX(-50%) translateY(30px);
+  width:900px;z-index:30;
+  background:rgba(5,9,26,.93);
+  border:3px solid #22456e;
+  box-shadow:0 0 0 3px #05060f,0 0 28px rgba(0,160,255,.12);
+  padding:12px 18px 14px;
+  opacity:0;pointer-events:none;transition:opacity .22s,transform .22s;
+}
+#qpanel.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto;}
+#qpanel.lock{pointer-events:none;}
+#qhead{display:flex;align-items:center;gap:12px;margin-bottom:9px;font-size:11px;}
+#qprog{color:#05060f;background:#00c8ff;padding:4px 8px;}
+#qtheme{color:#8fb8e0;}
+#qtext{font-size:12.5px;line-height:1.8;margin-bottom:9px;color:#eaf6ff;min-height:40px;}
+#qopts{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.opt{border:2px solid #2a4a75;background:#0a1228;padding:8px 11px;cursor:pointer;font-size:11.5px;line-height:1.75;display:flex;gap:9px;align-items:flex-start;color:#cfe6ff;font-family:inherit;text-align:left;transition:border-color .12s,background .12s;}
+.opt .k{color:#00f0ff;flex:none;}
+.opt:hover{border-color:#00c8ff;background:#0e1c3a;}
+.opt.right{border-color:#3dff8f;background:rgba(16,84,46,.45);color:#c9ffe0;}
+.opt.right .k{color:#3dff8f;}
+.opt.wrong{border-color:#ff4060;background:rgba(112,18,40,.5);color:#ffd4dd;}
+.opt.wrong .k{color:#ff4060;}
+.opt.dim{opacity:.4;}
+code{font-family:'Consolas','Courier New',monospace;background:#0e1a33;border:1px solid #2c4a78;padding:1px 5px;color:#7fe0ff;font-size:.92em;}
+/* ============ 对话框（小C） ============ */
+#dlg{
+  position:absolute;left:50%;bottom:26px;transform:translateX(-50%);
+  width:900px;min-height:136px;z-index:40;
+  background:rgba(6,10,30,.95);
+  border:3px solid #2c6d9e;
+  box-shadow:0 0 0 3px #05060f,0 0 26px rgba(0,180,255,.2);
+  padding:14px 18px 14px;display:none;gap:14px;cursor:pointer;
+}
+#dlg.show{display:flex;}
+#dlg.up{bottom:285px;} /* 与答题面板同时显示时上移 */
+#dlg .avatar{width:84px;height:84px;flex:none;border:2px solid #1c4a75;background:#081226;padding:8px;align-self:flex-start;}
+#xc-dlg{width:64px;height:64px;image-rendering:pixelated;}
+.d-main{flex:1;min-width:0;}
+.d-name{color:#00f0ff;font-size:11px;margin-bottom:9px;}
+.d-name span{color:#5c86ad;margin-left:8px;font-size:9px;}
+.d-hint{color:#4a6a92;font-size:9px;float:right;}
+.d-text{font-size:12.5px;line-height:1.95;color:#eaf6ff;min-height:52px;white-space:pre-wrap;}
+.d-next{position:absolute;right:14px;bottom:8px;color:#00f0ff;font-size:13px;animation:blink 0.9s steps(2) infinite;display:none;}
+@keyframes blink{50%{opacity:0;}}
+.blink{animation:blink 1s steps(2) infinite;}
+/* ============ 全屏画面通用 ============ */
+.screen{position:absolute;inset:0;z-index:60;display:none;flex-direction:column;align-items:center;background:rgba(4,6,16,.78);}
+.screen.show{display:flex;}
+/* ---- 标题画面 ---- */
+#scr-title{justify-content:center;gap:20px;}
+.t-tag{color:#ff6bd6;font-size:11px;letter-spacing:3px;}
+.t-logo{font-size:52px;color:#fff;letter-spacing:10px;text-shadow:4px 4px 0 #b44dff,8px 8px 0 rgba(0,240,255,.45);margin:6px 0;}
+.t-sub{color:#7fe0ff;font-size:13px;letter-spacing:5px;}
+.t-xc{display:flex;align-items:center;gap:16px;margin-top:10px;}
+#xc-title{width:64px;height:64px;image-rendering:pixelated;background:#081226;border:3px solid #1c4a75;padding:6px;}
+.t-bubble{background:#0a1631;border:2px solid #2c6d9e;padding:12px 16px;font-size:11px;line-height:2;color:#cfe6ff;position:relative;}
+.t-bubble::before{content:'';position:absolute;left:-12px;top:50%;transform:translateY(-50%);border:6px solid transparent;border-right-color:#2c6d9e;}
+.t-start{color:#ffe14d;font-size:14px;margin-top:12px;letter-spacing:2px;}
+.t-ctrl{color:#4a6a92;font-size:9px;letter-spacing:1px;margin-top:14px;line-height:2;}
+/* ---- 星图画面 ---- */
+#scr-map{padding:18px 30px 14px;}
+.m-head{width:100%;display:flex;align-items:center;justify-content:space-between;}
+.m-head h2{color:#7fe0ff;font-size:20px;letter-spacing:8px;text-shadow:3px 3px 0 rgba(180,77,255,.5);}
+.m-stat{color:#ffe14d;font-size:10px;line-height:1.9;text-align:right;}
+#map-area{position:relative;width:900px;height:478px;flex:none;}
+#map-svg{position:absolute;inset:0;width:900px;height:478px;}
+#map-svg polyline{fill:none;stroke-linejoin:round;}
+.route-dim{stroke:#1c2c50;stroke-width:3;stroke-dasharray:6 8;}
+.route-on{stroke:#35e0ff;stroke-width:3;stroke-dasharray:10 8;animation:dashmove 1.2s linear infinite;filter:drop-shadow(0 0 4px rgba(53,224,255,.8));}
+@keyframes dashmove{to{stroke-dashoffset:-18;}}
+.bossnode .nm{top:66px;}
+.node{position:absolute;width:50px;height:50px;transform:translate(-50%,-50%);border:3px solid #2a4a75;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;background:#081228;color:#cfe6ff;font-family:inherit;}
+.node .nm{position:absolute;top:54px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:10px;color:#8fb8e0;pointer-events:none;}
+.node.open{box-shadow:0 0 16px currentColor;animation:nodepulse 1.6s ease-in-out infinite;}
+.node.done::after{content:'★';position:absolute;top:-20px;left:50%;transform:translateX(-50%);color:#ffe14d;font-size:13px;text-shadow:0 0 8px rgba(255,225,77,.9);}
+.node.locked{border-color:#232a44;color:#3c4666;background:#0a0c18;cursor:not-allowed;}
+.node.locked .nm{color:#3c4666;}
+.node.bossnode{width:62px;height:62px;font-size:18px;}
+@keyframes nodepulse{50%{box-shadow:0 0 30px currentColor;}}
+.m-foot{width:100%;display:flex;align-items:center;justify-content:space-between;color:#4a6a92;font-size:10px;margin-top:2px;}
+/* ---- 结算画面 ---- */
+#scr-end{justify-content:center;gap:18px;}
+.end-ico{font-size:44px;color:#ffe14d;text-shadow:0 0 24px rgba(255,225,77,.8);}
+#end-title{font-size:30px;letter-spacing:6px;color:#fff;text-shadow:4px 4px 0 #b44dff;}
+#end-sub{color:#8fb8e0;font-size:12px;line-height:2.1;text-align:center;max-width:720px;}
+#end-stats{background:#0a1631;border:3px solid #22456e;padding:14px 26px;font-size:12px;line-height:2.3;color:#cfe6ff;}
+#end-stats b{color:#ffe14d;font-weight:normal;}
+#end-btns{display:flex;gap:16px;margin-top:8px;}
+.pxbtn{background:#0a1a38;border:3px solid #00c8ff;color:#bff4ff;padding:13px 24px;font-size:13px;cursor:pointer;font-family:inherit;letter-spacing:2px;box-shadow:0 4px 0 #063a55;transition:background .1s;}
+.pxbtn:hover{background:#00c8ff;color:#04101f;}
+.pxbtn:active{transform:translateY(3px);box-shadow:0 1px 0 #063a55;}
+.pxbtn.warn{border-color:#ff6bd6;box-shadow:0 4px 0 #5a1a4a;color:#ffc9ef;}
+.pxbtn.warn:hover{background:#ff6bd6;color:#1a0413;}
+.pxbtn.small{padding:8px 14px;font-size:10px;}
+/* ============ 静音按钮 ============ */
+#mute-btn{position:absolute;top:10px;right:12px;z-index:95;background:rgba(6,10,28,.88);border:2px solid #1c3355;color:#6f9cc9;font-family:inherit;font-size:9px;padding:6px 9px;cursor:pointer;}
+#mute-btn:hover{color:#7fe0ff;border-color:#2c6d9e;}
+#hud.show ~ #mute-btn{top:52px;}
+</style>
+</head>
+<body>
+<!-- ===== SEO 内容块：Canvas 游戏内容对搜索引擎不可见，这里提供真实文字介绍（视觉隐藏，不影响游戏） ===== -->
+<div style="position:absolute;left:-9999px;top:0;width:1px;height:1px;overflow:hidden;" aria-hidden="false">
+  <h1>前端宇宙 · 知识闯关 FRONTEND GALAXY - 免费在线前端学习游戏</h1>
+  <p>太空像素风前端知识闯关网页游戏。驾驶像素飞船穿越 12 个星域，每一只 Bug 怪兽对应一道前端选择题：答对发射激光消灭怪兽并得分，答错怪兽反击扣除护盾，同时显示正确答案与详细解析。AI 领航员「小C」全程对话教学，每关开始前讲解核心概念，每题答后无论对错都有知识点讲解、记忆口诀与生活类比。</p>
+  <h2>12 大星域关卡</h2>
+  <ul>
+    <li>第1关 HTML 起源星：认识 HTML（什么是标签、文档基本结构）</li>
+    <li>第2关 标签陨石带：HTML 常用标签（标题、段落、图片、链接、列表）</li>
+    <li>第3关 表单空间站：HTML 表单与语义化（input 类型、语义化标签）</li>
+    <li>第4关 CSS 星云：CSS 入门（三种引入方式、基本选择器）</li>
+    <li>第5关 色彩双子星：CSS 文本与背景（颜色、字体、背景属性）</li>
+    <li>第6关 盒模型迷宫：CSS 盒模型（content / padding / border / margin）</li>
+    <li>第7关 布局虫洞：CSS 布局（Flex 布局、position 定位、单位）</li>
+    <li>第8关 JS 行星：JavaScript 入门（变量、数据类型、运算符）</li>
+    <li>第9关 逻辑小行星带：JS 流程控制（if 判断、for / while 循环）</li>
+    <li>第10关 函数反应堆：JS 函数与数组（函数定义、常用数组方法）</li>
+    <li>第11关 DOM 风暴带：JS 操作网页（DOM 查询、事件监听、修改内容）</li>
+    <li>第12关 终极 Boss 全栈黑洞：前端综合难题（HTML + CSS + JS 混合）</li>
+  </ul>
+  <h2>游戏特色</h2>
+  <ul>
+    <li>共 72 道 HTML / CSS / JavaScript 四选一选择题，难度循序渐进</li>
+    <li>复古像素美术：视差滚动星空、霓虹配色、CRT 扫描线效果</li>
+    <li>Web Audio API 合成 8-bit 音效：激光、爆炸、答对、答错、通关音乐</li>
+    <li>星图式关卡进度，通关解锁下一星域，最高分保存在本地</li>
+    <li>纯前端单文件实现，免费在线玩，无需安装，适合前端入门学习</li>
+  </ul>
+  <h2>操作方式</h2>
+  <p>空格键推进对话，数字键 1-4 选择答案，M 键静音，ESC 键返回星图。支持鼠标点击操作。</p>
+</div>
+<noscript>
+  <p style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:#7fe0ff;font-size:16px;z-index:999;text-align:center;">
+    「前端宇宙 · 知识闯关」需要启用 JavaScript 才能游玩。<br>
+    FRONTEND GALAXY requires JavaScript to play.
+  </p>
+</noscript>
+
+<div id="stage">
+  <canvas id="cv" width="1920" height="1200"></canvas>
+
+  <!-- 战斗 HUD -->
+  <div id="hud">
+    <div class="hud-chip" id="hud-lv">第1关</div>
+    <div class="hud-chip"><span class="lbl">护盾</span><div id="hud-hp"><i></i><i></i><i></i></div></div>
+    <div class="hud-chip"><span class="lbl">得分</span><span id="hud-score">000000</span></div>
+    <div class="hud-chip"><canvas id="hud-micon" width="30" height="22"></canvas><span id="hud-en">× 0</span></div>
+  </div>
+
+  <!-- 答题面板 -->
+  <div id="qpanel">
+    <div id="qhead"><span id="qprog">Q1/6</span><span id="qtheme"></span></div>
+    <div id="qtext"></div>
+    <div id="qopts"></div>
+  </div>
+
+  <!-- 小C 对话框 -->
+  <div id="dlg">
+    <div class="avatar"><canvas id="xc-dlg" width="64" height="64"></canvas></div>
+    <div class="d-main">
+      <div class="d-name">小C <span>AI 领航员 · NAVIGATOR</span><span class="d-hint">空格 / 点击 继续</span></div>
+      <div class="d-text" id="d-text"></div>
+    </div>
+    <div class="d-next" id="d-next">▼</div>
+  </div>
+
+  <!-- 标题画面 -->
+  <div class="screen" id="scr-title">
+    <div class="t-tag">FRONTEND GALAXY · PIXEL QUIZ</div>
+    <h1 class="t-logo">前端宇宙</h1>
+    <div class="t-sub">—— 知识闯关 · 12 星域 ——</div>
+    <div class="t-xc">
+      <canvas id="xc-title" width="64" height="64"></canvas>
+      <div class="t-bubble">我是领航员小C！<br>驾驶飞船穿越 12 大星域，<br>用前端知识消灭 Bug 怪兽吧！</div>
+    </div>
+    <div class="t-start blink">— 按 空格键 / 点击 开始 —</div>
+    <div class="t-ctrl">空格：推进对话　|　数字键 1-4：选择答案　|　M：静音　|　ESC：返回星图</div>
+  </div>
+
+  <!-- 星图画面 -->
+  <div class="screen" id="scr-map">
+    <div class="m-head">
+      <h2>星 图</h2>
+      <div class="m-stat" id="map-stat"></div>
+    </div>
+    <div id="map-area"><svg id="map-svg" viewBox="0 0 900 478"></svg></div>
+    <div class="m-foot">
+      <span>▸ 点击已点亮的星点即可出发（答对消灭怪兽，答错损失护盾）</span>
+      <div><button class="pxbtn small warn" id="btn-reset">重置进度</button> <button class="pxbtn small" id="btn-title">标题画面</button></div>
+    </div>
+  </div>
+
+  <!-- 结算画面（通关 / 失败 / 毕业） -->
+  <div class="screen" id="scr-end">
+    <div class="end-ico" id="end-ico">★</div>
+    <h2 id="end-title"></h2>
+    <div id="end-sub"></div>
+    <div id="end-stats"></div>
+    <div id="end-btns"></div>
+  </div>
+
+  <button id="mute-btn">SND:ON</button>
+  <div id="crt"></div>
+</div>
+
+<script>
+'use strict';
+/* ==================================================================
+ *  前端宇宙 · 知识闯关  —— 单文件太空像素风答题游戏
+ *  结构：工具 → 音效引擎 → 像素精灵 → 关卡数据 → 存档 →
+ *        对话系统 → 战斗系统 → 星图/结算 → 渲染循环 → 输入
+ * ================================================================== */
+
+/* ---------------- 基础工具 ---------------- */
+const $  = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
+const rnd = (a,b)=>a+Math.random()*(b-a);
+const pick = arr => arr[Math.floor(Math.random()*arr.length)];
+const pad = (n,l=6)=>String(n).padStart(l,'0');
+/* 转义 HTML，再把 `代码` 转成 <code> 标签，\n 转换行 */
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function fmt(s){return esc(s).replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\n/g,'<br>');}
+
+const W=960, H=600;
+const cv=$('#cv'), ctx=cv.getContext('2d');
+ctx.imageSmoothingEnabled=false;
+/* 2 倍超采样，保证缩放后依旧清晰 */
+ctx.scale(2,2);
+
+/* 舞台自适应缩放 */
+function fitStage(){
+  const s=Math.min(innerWidth/W, innerHeight/H);
+  $('#stage').style.transform=`translate(-50%,-50%) scale(${s})`;
+}
+addEventListener('resize',fitStage); fitStage();
+
+/* ---------------- 音效引擎（Web Audio 合成 8-bit 音效） ---------------- */
+const Snd={
+  ctx:null, master:null, muted:false, bgmTimer:null, bgmStep:0,
+  /* 浏览器自动播放策略：首次交互时初始化/恢复音频上下文 */
+  ensure(){
+    if(!this.ctx){
+      const AC=window.AudioContext||window.webkitAudioContext;
+      if(!AC)return;
+      this.ctx=new AC();
+      this.master=this.ctx.createGain();
+      this.master.gain.value=this.muted?0:0.4;
+      this.master.connect(this.ctx.destination);
+    }
+    if(this.ctx.state==='suspended')this.ctx.resume();
+  },
+  /* 基础音符：freq 频率 / dur 时长 / type 波形 / vol 音量 / slide 滑向频率 / delay 延迟 */
+  tone(f,dur,type='square',vol=.5,slide=null,delay=0){
+    if(!this.ctx)return;
+    const t0=this.ctx.currentTime+delay;
+    const o=this.ctx.createOscillator(),g=this.ctx.createGain();
+    o.type=type;o.frequency.setValueAtTime(f,t0);
+    if(slide!==null)o.frequency.exponentialRampToValueAtTime(Math.max(20,slide),t0+dur);
+    g.gain.setValueAtTime(vol,t0);
+    g.gain.exponentialRampToValueAtTime(.001,t0+dur);
+    o.connect(g);g.connect(this.master);
+    o.start(t0);o.stop(t0+dur+.02);
+  },
+  /* 白噪声（爆炸/受击） */
+  noise(dur,vol=.5,delay=0){
+    if(!this.ctx)return;
+    const t0=this.ctx.currentTime+delay, n=Math.floor(this.ctx.sampleRate*dur);
+    const buf=this.ctx.createBuffer(1,n,this.ctx.sampleRate), d=buf.getChannelData(0);
+    for(let i=0;i<n;i++)d[i]=Math.random()*2-1;
+    const src=this.ctx.createBufferSource();src.buffer=buf;
+    const f=this.ctx.createBiquadFilter();f.type='lowpass';f.frequency.value=900;
+    const g=this.ctx.createGain();
+    g.gain.setValueAtTime(vol,t0);g.gain.exponentialRampToValueAtTime(.001,t0+dur);
+    src.connect(f);f.connect(g);g.connect(this.master);src.start(t0);
+  },
+  laser(){this.tone(880,.16,'square',.32,140);},
+  explode(){this.noise(.35,.5);this.tone(120,.3,'sawtooth',.28,40);},
+  hit(){this.tone(160,.22,'sawtooth',.4,60);this.noise(.18,.35);},
+  correct(){[523.25,659.25,783.99].forEach((f,i)=>this.tone(f,.12,'square',.28,null,i*.09));},
+  wrong(){this.tone(233,.16,'square',.3,207);this.tone(155,.3,'square',.3,110,.14);},
+  blip(){this.tone(1250,.03,'square',.05);},
+  select(){this.tone(660,.06,'square',.18);},
+  victory(){[523,659,784,1047,784,1047,1319].forEach((f,i)=>this.tone(f,.16,'square',.28,null,i*.13));},
+  fail(){[330,277,233,196].forEach((f,i)=>this.tone(f,.24,'triangle',.3,null,i*.19));},
+  toggleMute(){this.muted=!this.muted;if(this.master)this.master.gain.value=this.muted?0:.4;return this.muted;},
+  /* 简易 8-bit 低音循环 BGM */
+  bgmStart(){
+    if(this.bgmTimer||!this.ctx)return;
+    const seq=[110,110,131,110,147,147,131,98];this.bgmStep=0;
+    this.bgmTimer=setInterval(()=>{
+      if(this.muted)return;
+      this.tone(seq[this.bgmStep%8],.13,'triangle',.09);
+      this.bgmStep++;
+    },240);
+  },
+  bgmStop(){if(this.bgmTimer){clearInterval(this.bgmTimer);this.bgmTimer=null;}}
+};
+
+/* ---------------- 像素精灵（Canvas 程序化绘制） ---------------- */
+/* 用字符串数组定义像素画，'.' 为透明，其它字符查色板 */
+function sprite(rows,pal){
+  const cells=[];
+  rows.forEach((r,y)=>{for(let x=0;x<r.length;x++){const ch=r[x];if(ch!=='.'&&pal[ch])cells.push([x,y,pal[ch]]);}});
+  return {w:rows[0].length,h:rows.length,cells};
+}
+function drawSprTo(c,sp,x,y,s){
+  for(const [cx,cy,col] of sp.cells){c.fillStyle=col;c.fillRect(x+cx*s,y+cy*s,s,s);}
+}
+
+/* 玩家飞船（13×10） */
+const SHIP_PAL={C:'#00eaff',D:'#0a7a9a',P:'#c04dff',Y:'#ffe14d',W:'#ffffff'};
+const SHIP=sprite([
+'......C......',
+'......C......',
+'.....CYC.....',
+'.....CYC.....',
+'..P..CCC..P..',
+'.PP.CCCCC.PP.',
+'PPPCCCDCCCPPP',
+'PP.CDDDDC.PP.',
+'.D..W...W..D.',
+'....W...W....',
+],SHIP_PAL);
+
+/* Bug 怪兽三种造型（11×8），主色 A 按关卡注入 */
+const BUG_ROWS=[
+['.A.......A.','..A.....A..','.AAAAAAAAA.','AA.EAAAE.AA','AAAAAAAAAAA','A.A.AAA.A.A','..A..A.A..A','.A..A.A..A.'],
+['..A.....A..','...A...A...','..AAAAAAA..','.A.EAAAE.A.','.AAAAAAAAA.','AA.AAAAA.AA','A..A...A..A','...AA.AA...'],
+['.....A.....','....AAA....','...AAAAA...','.A.EAAAE.A.','.AAAAAAAAA.','..A.A.A.A..','.A..A.A..A.','..A.....A..'],
+];
+/* 第 12 关 Boss（19×13） */
+const BOSS=sprite([
+'.AA.............AA.',
+'..AA...........AA..',
+'...AA.........AA...',
+'....AAAAAAAAAAA....',
+'...AAAAAAAAAAAAA...',
+'..AAAAAAAAAAAAAAA..',
+'.AAA.EE.AAA.EE.AAA.',
+'.AAA.EE.AAA.EE.AAA.',
+'AAAAAAAAAAAAAAAAAAA',
+'AAA.AAAA.A.AAAA.AAA',
+'.A..AAA..A..AAA..A.',
+'....AA...A...AA....',
+'...A..........A....',
+],{A:'#9b30ff',E:'#ff2030'});
+
+/* 小C 头像（16×16，两帧：睁眼/眨眼） */
+const XC_PAL={Y:'#ffe14d',G:'#8a94b8',H:'#dfe6ff',S:'#0c1230',E:'#00f0ff',M:'#00f0ff',D:'#3a4a8a'};
+const XC_OPEN=sprite([
+'.......Y........',
+'.......G........',
+'................',
+'....HHHHHHHH....',
+'...HHHHHHHHHH...',
+'...HSSSSSSSSH...',
+'..HSSSSSSSSSSH..',
+'..HSEESSSSEESH..',
+'..HSEESSSSEESH..',
+'..HSSSSMMSSSSH..',
+'..HSSSMMMSSSSH..',
+'...HSSSSSSSSH...',
+'...HHHHHHHHHH...',
+'..EE.HHHHHH.EE..',
+'................',
+'................',
+],XC_PAL);
+const XC_CLOSE=sprite([
+'.......Y........',
+'.......G........',
+'................',
+'....HHHHHHHH....',
+'...HHHHHHHHHH...',
+'...HSSSSSSSSH...',
+'..HSSSSSSSSSSH..',
+'..HSDDSSSSDDSH..',
+'..HSSSSSSSSSSH..',
+'..HSSSSMMSSSSH..',
+'..HSSSMMMSSSSH..',
+'...HSSSSSSSSH...',
+'...HHHHHHHHHH...',
+'..EE.HHHHHH.EE..',
+'................',
+'................',
+],XC_PAL);
+/* 绘制小C到指定 canvas（含眨眼与天线灯闪烁） */
+function drawXC(canvas,t){
+  const c=canvas.getContext('2d');
+  c.imageSmoothingEnabled=false;
+  c.clearRect(0,0,64,64);
+  const blink=(t%3.4)<.12;
+  const sp=blink?XC_CLOSE:XC_OPEN;
+  drawSprTo(c,sp,0,0,4);
+  /* 天线灯呼吸 */
+  c.fillStyle=(t*2%1<.5)?'#ffe14d':'#fff7b0';
+  c.fillRect(7*4,0,4,4);
+}
+
+/* ---------------- 星空背景（三层视差） ---------------- */
+const stars=[];
+(function initStars(){
+  const SP=[16,40,88],R=[1,1.5,2],C=['#5a6b9c','#9fb4e8','#e8f2ff'];
+  for(let i=0;i<150;i++){
+    const l=Math.floor(Math.random()*3);
+    stars.push({x:Math.random()*W,y:Math.random()*H,l,sp:SP[l],r:R[l],c:C[l]});
+  }
+})();
+
+/* ==================================================================
+ *  关卡数据（结构化数组，方便扩充）
+ *  q:题干  opts:四个选项  ans:正确答案下标  why:解析  tip:口诀/类比
+ * ================================================================== */
+const LEVELS=[
+/* ========== 第 1 关：HTML 起源星 ========== */
+{
+name:'HTML 起源星',theme:'认识 HTML：什么是标签、文档基本结构',color:'#00eaff',
+intro:[
+'指挥官，欢迎登舰！我是你的 AI 领航员——小C！',
+'我们的目的地，是传说中知识浓度最高的「前端宇宙」！',
+'前端宇宙由三大势力构成：HTML 星系、CSS 星云、JS 行星群。',
+'第一站：HTML 起源星！它是所有网页「骨架」的诞生地。',
+'HTML 全称 HyperText Markup Language——超文本标记语言。',
+'注意哦，它不是编程语言，而是「标记语言」：用一个个标签描述网页结构。',
+'标签通常成对出现：开始标签 <p> 包住内容，结束标签 </p> 收尾，结束标签多一个斜杠。',
+'标准文档四大骨架：<!DOCTYPE html> 声明 → <html> 根标签 → <head> 幕后配置 + <body> 台前内容。',
+'滴滴——警报！起源星周围检测到 Bug 怪兽群！它们由「知识误解」凝聚而成！',
+'答对题目就能发射激光消灭它们。首场战斗，跟我来！'
+],
+questions:[
+{q:'HTML 的全称是什么？',opts:['HyperText Markup Language','HighText Machine Language','HyperTransfer Markup Language','HomeTool Making Language'],ans:0,
+why:'HTML = HyperText Markup Language（超文本标记语言），用来描述网页的结构，是网页世界的「骨架」。',tip:'超文本 · 标记 · 语言——三个词拼出 HTML。'},
+{q:'下列哪一项是正确的标签写法？',opts:['`<p>你好</p>`','`<p>你好<p/>`','`</p>你好<p>`','`<p>你好`'],ans:0,
+why:'标签成对出现：<p> 是开始标签，</p> 是结束标签，比开始标签多一个斜杠，且斜杠在前面。',tip:'正着开、反着关，斜杠挂在结束端。'},
+{q:'网页中用户「看得见」的内容，应该写在哪个标签里？',opts:['`<head>`','`<body>`','`<title>`','`<meta>`'],ans:1,
+why:'<body> 是网页的「舞台」，用户看到的一切都在这里；<head> 是幕后，放看不见的配置信息。',tip:'body 在台上表演，head 在幕后指挥。'},
+{q:'下列哪一项适合放在 `<head>` 里？',opts:['`<title>网页标题</title>`','`<h1>大标题</h1>`','`<p>一段文字</p>`','`<img src="pic.png">`'],ans:0,
+why:'<head> 存放网页元信息：<title> 页面标题、<meta> 字符集、<link> 样式表，它们不会出现在页面正文中。',tip:'head 是后台休息室，只住幕后工作人员。'},
+{q:'`<!DOCTYPE html>` 写在文档第一行，它的作用是？',opts:['声明本文档是 HTML5 文档','定义网页的大标题','引入 CSS 样式表','创建一个按钮'],ans:0,
+why:'DOCTYPE 告诉浏览器「请用 HTML5 标准模式解析我」，必须是整个文档的第一行，前面不能有任何内容。',tip:'DOCTYPE 打头阵，浏览器才知道这出戏怎么演。'},
+{q:'HTML 属于下列哪类语言？',opts:['编程语言','标记语言','数据库语言','样式语言'],ans:1,
+why:'HTML 用来「标记」内容结构，没有变量、循环等逻辑能力，所以是标记语言而不是编程语言。',tip:'HTML 只搭骨架不动脑，动脑要靠 JS。'}
+],
+summary:[
+'起源星净化完成！来复盘本关知识清单——',
+'① HTML：超文本标记语言，负责网页结构',
+'② 标签成对出现：<p> 开始、</p> 结束，斜杠在结束端',
+'③ 文档骨架：DOCTYPE → html → head（幕后）+ body（台前）',
+'指挥官首战表现相当漂亮！知识能量已入库！',
+'下一站预告：「标签陨石带」——去收集标题、图片、链接这些常用标签！出发！'
+]
+},
+/* ========== 第 2 关：标签陨石带 ========== */
+{
+name:'标签陨石带',theme:'HTML 常用标签：标题、段落、图片、链接、列表',color:'#ff5f5f',
+intro:[
+'起源星信号已恢复！我们正在驶入「标签陨石带」。',
+'这条陨石带里，每块陨石都封存着一个常用标签的力量！',
+'标题六兄弟：<h1> 到 <h6>——数字越小，字号越大，h1 是当之无愧的老大。',
+'出场率最高的三巨头：段落 <p>、图片 <img>、链接 <a>。',
+'<img> 靠 src 属性找到图片地址，alt 属性在图片挂掉时出来救场。',
+'<a> 靠 href 属性指定跳转目的地，标签中间的文字就是点击热区。',
+'列表两兄弟：无序列表 <ul>、有序列表 <ol>，里面都住着列表项 <li>。',
+'警报！Bug 怪兽占领了陨石带，正在吞噬标签能量！',
+'用你刚学的标签知识，把它们统统轰下来！'
+],
+questions:[
+{q:'想显示网页中「最大」的标题，应该用哪个标签？',opts:['`<h6>`','`<h1>`','`<head>`','`<title>`'],ans:1,
+why:'h1~h6 数字越小字号越大，h1 是最大的一级标题，一个页面最好只用一个 h1（利于 SEO）。',tip:'标题界倒计时：1 最大，6 最小。'},
+{q:'定义一个文字段落，应该使用哪个标签？',opts:['`<p>`','`<pg>`','`<par>`','`<hr>`'],ans:0,
+why:'p 是 paragraph（段落）的缩写，专门包裹一段文字；hr 是水平分隔线，别混喽。',tip:'p = paragraph，段落专用。'},
+{q:'`<img>` 标签中，指定图片地址的属性是？',opts:['href','src','alt','link'],ans:1,
+why:'src（source 来源）指定图片文件地址；href 是 <a> 的专利；alt 是图片加载失败时的替换文字。',tip:'图找 src，链找 href，alt 是备用解说员。'},
+{q:'创建一个点击跳转的链接，正确写法是？',opts:['`<a href="https://example.com">点我</a>`','`<a src="https://example.com">点我</a>`','`<link href="https://example.com">点我</link>`','`<a url="https://example.com">点我</a>`'],ans:0,
+why:'<a> 用 href 指定跳转地址，标签中间是可点击的文字；src 属于 img，link 用来引入 CSS。',tip:'a 靠 href 带路，点谁谁跳转。'},
+{q:'下列哪个是「无序列表」的正确写法？',opts:['`<ul><li>苹果</li><li>香蕉</li></ul>`','`<ol><li>苹果</li><li>香蕉</li></ol>`','`<ul>苹果 香蕉</ul>`','`<li><ul>苹果</ul></li>`'],ans:0,
+why:'无序列表 = <ul> + 若干 <li>；<ol> 是有序列表（自带编号）；li 必须住在 ul 或 ol 里面。',tip:'ul 无序 ol 有序，li 是排队的小居民。'},
+{q:'关于 <h1> ~ <h6>，说法正确的是？',opts:['h1 字号最大','h6 字号最大','六个字号完全一样','数字越大字号越大'],ans:0,
+why:'标题标签的数字与字号成反比：h1 最大、h6 最小，很多新手都会记反，你可别中招！',tip:'1 号巨人，6 号小矮人。'}
+],
+summary:[
+'陨石带清空！标签能量全部回收！知识清单——',
+'① 标题 h1~h6：数字越小字越大',
+'② 图片 img：src 定地址，alt 做备胎',
+'③ 链接 a：href 定去向',
+'④ 列表：ul 无序、ol 有序、li 装内容',
+'这套「结构化思维」就是 HTML 的灵魂，你已经拿捏了！',
+'下一站：「表单空间站」——那里是收集用户数据的枢纽！'
+]
+},
+/* ========== 第 3 关：表单空间站 ========== */
+{
+name:'表单空间站',theme:'HTML 表单与语义化：input 类型、语义化标签',color:'#ffd24d',
+intro:[
+'前方到达「表单空间站」——前端宇宙所有用户输入数据的集散枢纽！',
+'表单的容器是 <form>，里面最常见的居民是 <input> 输入框。',
+'input 有个百变属性 type：text 文本框、password 密码框……',
+'……还有 radio 单选按钮、checkbox 复选框、submit 提交按钮！',
+'给每个表单项配一个 <label> 标注，点击文字也能选中输入框，体验直线上升！',
+'下拉菜单用 <select> 搭配 <option>，多行文本用 <textarea>。',
+'空间站还在推行「语义化标签」：header 头部、nav 导航、main 主体、footer 底部。',
+'语义化 = 用对的标签做对的事：代码好读、SEO 友好、无障碍设备也能「听懂」页面。',
+'紧急警报！怪兽偷走了空间站的登录表单！帮我们夺回来！'
+],
+questions:[
+{q:'要创建密码输入框（输入内容显示为圆点），type 应该是？',opts:['text','password','secret','hidden'],ans:1,
+why:'type="password" 会把输入内容自动显示为圆点，防止密码被旁边的人偷看。',tip:'密码框 password，天生的打码体质。'},
+{q:'想让用户从多个选项里「勾选多项」，用哪种 input 类型？',opts:['radio','checkbox','text','submit'],ans:1,
+why:'radio 单选：同一 name 的组里只能选一个；checkbox 复选：想勾几个勾几个。',tip:'radio 电台独占频道，checkbox 勾得越多越好。'},
+{q:'语义化标签中，表示「导航区域」的是？',opts:['`<nav>`','`<guide>`','`<menu-bar>`','`<goto>`'],ans:0,
+why:'nav 是 navigation 的缩写，专门放菜单和导航链接组；guide、menu-bar、goto 都不是标准标签。',tip:'nav = navigation，导航专属车牌。'},
+{q:'<label> 标签的核心作用是？',opts:['为表单控件定义文字标注','定义一个表格','给文字加粗','创建按钮'],ans:0,
+why:'label 为输入框代言：配合 for/id 属性，点击文字也能聚焦输入框，对屏幕阅读器特别友好。',tip:'label 是输入框的代言人，点文字等于点框。'},
+{q:'网页底部的版权信息，最适合放在哪个语义化标签里？',opts:['`<header>`','`<footer>`','`<main>`','`<aside>`'],ans:1,
+why:'header 管头部、footer 管底部、main 管主体内容、aside 管侧边栏——各就各位，各司其职。',tip:'header 头 footer 脚，main 是 C 位担当。'},
+{q:'创建下拉列表，应该使用哪组标签？',opts:['`<select>` 和 `<option>`','`<dropdown>` 和 `<item>`','`<list>` 和 `<li>`','`<choose>` 和 `<opt>`'],ans:0,
+why:'select 定义下拉列表框，option 定义其中的选项；dropdown、choose 都是不存在的标签。',tip:'select 拉清单，option 排排站。'}
+],
+summary:[
+'空间站表单已夺回！知识清单——',
+'① input 百变 type：text / password / radio / checkbox / submit',
+'② label 为输入框代言；select + option 组成下拉菜单',
+'③ 语义化标签：header / nav / main / footer 各司其职',
+'语义化三大好处：可读、SEO、无障碍——全都记住了吗？',
+'下一站：绚烂的「CSS 星云」！网页要开始化妆了！'
+]
+},
+/* ========== 第 4 关：CSS 星云 ========== */
+{
+name:'CSS 星云',theme:'CSS 入门：三种引入方式、基本选择器',color:'#ff7bf5',
+intro:[
+'穿过空间站，眼前这片绚烂的星云就是——CSS 星云！',
+'如果说 HTML 是骨架，CSS 就是给骨架穿衣化妆的「造型师」。',
+'CSS 全称 Cascading Style Sheets，层叠样式表。',
+'把样式写进网页共有三种方式，听好了——',
+'① 行内样式：直接写在标签的 style 属性里，耦合太高，不推荐常驻；',
+'② 内部样式表：写在 <style> 标签里，适合小实验；',
+'③ 外部样式表：用 <link> 引入 .css 文件——结构与样式分离，开发首选！',
+'而「选择器」是 CSS 的寻人启事：标签选择器 p、类选择器 .box、ID 选择器 #header。',
+'优先级口诀先背下来：行内 > ID > 类 > 标签。',
+'星云里漂浮着 Bug 怪兽，它们最怕精准的选择器打击！'
+],
+questions:[
+{q:'CSS 的全称是？',opts:['Cascading Style Sheets','Creative Style System','Computer Style Software','Colorful Sheet Style'],ans:0,
+why:'CSS = Cascading Style Sheets（层叠样式表），「层叠」指多条样式规则可以叠加生效。',tip:'层叠样式表，规则像千层饼一样叠起来。'},
+{q:'同一元素被多种方式设置样式（选择器权重相同时），优先级最高的是？',opts:['行内样式（style 属性）','外部样式表','内部样式表','三种完全一样'],ans:0,
+why:'优先级：行内 > ID > 类 > 标签。内部还是外部样式表不影响优先级，起决定作用的是选择器本身。',tip:'越贴近元素本人，说话越算数。'},
+{q:'想给页面上「所有 <p> 标签」设置红字，正确的选择器是？',opts:['`p { color: red; }`','`.p { color: red; }`','`#p { color: red; }`','`*p { color: red; }`'],ans:0,
+why:'直接写标签名 p 就是标签选择器，一网打尽所有 <p>；.p 是类选择器，#p 是 ID 选择器。',tip:'裸名找标签，点号找类，井号找 ID。'},
+{q:'类选择器使用哪个符号开头？',opts:['#','.','@','$'],ans:1,
+why:'.box 选中 class="box" 的元素；# 是 ID 选择器专用；@ 属于 @media 之类的规则语法。',tip:'点类（.class）井号 ID（#id），@ 是规则开场白。'},
+{q:'在 HTML 中引入外部样式表 style.css，正确的写法是？',opts:['`<link rel="stylesheet" href="style.css">`','`<style src="style.css">`','`<css href="style.css">`','`<script src="style.css">`'],ans:0,
+why:'外部 CSS 用 link 标签引入：rel="stylesheet" 声明关系、href 指向文件，一般放在 head 里。',tip:'外链样式 link 牵，rel 必须写 stylesheet。'},
+{q:'下列选择器中，优先级最高的是？',opts:['`#header`','`.menu`','`div`','`*`'],ans:0,
+why:'ID 选择器（#header）的权重高于类选择器（.menu）、标签选择器（div）和通配符（*）。',tip:'王者 ID > 贵族类 > 平民标签 > 路人通配。'}
+],
+summary:[
+'CSS 星云穿越成功！知识清单——',
+'① CSS：层叠样式表，负责网页外观',
+'② 三种引入：行内、内部 <style>、外部 <link>（推荐）',
+'③ 选择器：标签 / .类 / #ID，优先级 ID > 类 > 标签',
+'指挥官，你已经能给网页「化妆」了！',
+'下一站：「色彩双子星」——专攻文字与背景的色彩魔法！'
+]
+},
+/* ========== 第 5 关：色彩双子星 ========== */
+{
+name:'色彩双子星',theme:'CSS 文本与背景：颜色、字体、背景属性',color:'#7bffb0',
+intro:[
+'欢迎来到「色彩双子星」！两颗行星双星共舞：一颗管文字，一颗管背景。',
+'先上色卡：颜色三种常用写法——英文单词 red、十六进制 #FF0000、rgb(255, 0, 0)。',
+'字体三剑客：font-family 字体族、font-size 字号、font-weight 粗细。',
+'文本四件套：color 文字颜色、text-align 对齐、line-height 行高、text-decoration 装饰线。',
+'背景四大将：background-color 背景色、background-image 背景图、background-size 尺寸、background-repeat 平铺。',
+'新手最容易踩的坑来了：color 管的是「文字颜色」！',
+'而 background-color 管的是「背景颜色」——一个是墨水，一个是墙漆，千万别搞混！',
+'双子星的怪兽精通伪装术，只有分清文字与背景属性才能识破它们！',
+'擦亮眼睛，准备战斗！'
+],
+questions:[
+{q:'设置「文字颜色」，应该使用哪个属性？',opts:['color','background-color','font-color','text-color'],ans:0,
+why:'CSS 里文字颜色就是 color；background-color 是背景色；font-color、text-color 这两个属性根本不存在。',tip:'说颜色就是 color，背景请加 background-。'},
+{q:'十六进制颜色 #000000 表示什么颜色？',opts:['白色','黑色','红色','透明色'],ans:1,
+why:'十六进制每两位分别代表红、绿、蓝，全是 0 表示一点光都不发——黑色；#FFFFFF 全开是白色。',tip:'000 全灭是黑夜，FFF 全开是白昼。'},
+{q:'让一段文字「水平居中」，正确的属性是？',opts:['`text-align: center`','`align: center`','`vertical-align: center`','`float: center`'],ans:0,
+why:'text-align 控制文本水平对齐（left / center / right）；float 没有 center 值；vertical-align 管行内元素的垂直对齐。',tip:'文字对齐找 text-align，别拉 float 撑场面。'},
+{q:'font-size: 16px 中的 px 代表什么？',opts:['像素','百分比','字符数','亮度值'],ans:0,
+why:'px = pixel 像素，是屏幕成像的最小方格，网页里最常用的固定单位。',tip:'px 是屏幕上的小方格，一格一像素。'},
+{q:'想让背景图「只显示一次、不平铺」，正确的设置是？',opts:['`background-repeat: no-repeat`','`background-repeat: repeat-x`','`background-size: once`','`bg-loop: off`'],ans:0,
+why:'background-repeat 控制平铺方式：repeat 默认铺满、no-repeat 只显示一次、repeat-x / repeat-y 单方向平铺。',tip:'repeat 铺满整面墙，no-repeat 只贴一张画。'},
+{q:'给文字添加下划线，应该使用？',opts:['`text-decoration: underline`','`text-align: underline`','`font-style: underline`','`underline: true`'],ans:0,
+why:'text-decoration 负责装饰线：underline 下划线、line-through 删除线、none 去掉装饰（常用来去掉链接下划线）。',tip:'装饰线归 decoration 管，下划删除随你挑。'}
+],
+summary:[
+'双子星通关！文字与背景魔法已掌握！知识清单——',
+'① 颜色三种写法：单词 / 十六进制 / rgb()',
+'② 文字：color、font-family / size / weight、text-align、line-height',
+'③ 背景：background-color / image / size / repeat',
+'墨水与墙漆，从此再也不会搞混了！',
+'下一站危机四伏：「盒模型迷宫」——那里的一切都是一个盒子！'
+]
+},
+/* ========== 第 6 关：盒模型迷宫 ========== */
+{
+name:'盒模型迷宫',theme:'CSS 盒模型：content / padding / border / margin',color:'#ffa54d',
+intro:[
+'欢迎闯入「盒模型迷宫」！先说一个 CSS 宇宙的至高真理——',
+'在 CSS 眼里，网页中每一个元素都是一个「盒子」！',
+'盒子从内到外共四层：content → padding → border → margin。',
+'content 内容区：文字和图片居住的地方。',
+'padding 内边距：内容和边框之间的缓冲空隙——相当于盒子里铺的海绵！',
+'border 边框：盒子的墙。margin 外边距：这个盒子与其他盒子之间的「社交距离」！',
+'生活类比包你终身难忘：content 是手机，padding 是手机壳，border 是快递盒，margin 是快递之间的距离！',
+'还有一个布局神器：box-sizing: border-box——让 width 直接包含 padding 和 border，算尺寸不用做加法！',
+'迷宫怪兽最擅长「间距魔法」，一不留神就把你框进陷阱。',
+'记住四层结构的顺序，我们冲！'
+],
+questions:[
+{q:'盒模型从内到外的正确结构顺序是？',opts:['content → padding → border → margin','content → margin → border → padding','padding → content → border → margin','margin → border → padding → content'],ans:0,
+why:'从里到外依次是：内容 content、内边距 padding、边框 border、外边距 margin——请焊死在脑子里！',tip:'盒模型四层洋葱：内容、内距、边框、外距。'},
+{q:'「内容与边框之间的距离」由哪个属性控制？',opts:['margin','padding','gap','border-space'],ans:1,
+why:'padding 是盒子内部的填充空隙（内容与边框之间）；margin 是盒子外部的间距。',tip:'padding 屋里铺地毯，margin 院外留空地。'},
+{q:'控制「盒子与其他盒子之间距离」的属性是？',opts:['padding','margin','border','outline'],ans:1,
+why:'margin 负责盒子之间的社交距离；padding 管屋里的留白；outline 是轮廓线，不占布局空间。',tip:'对外社交找 margin，对内留白找 padding。'},
+{q:'类比记忆：如果把 content 比作手机，那 padding 相当于？',opts:['手机壳','快递盒','隔壁的快递','快递员'],ans:0,
+why:'经典类比：content 手机 → padding 手机壳 → border 快递盒 → margin 快递之间的距离。',tip:'机、壳、盒、距离——盒模型四件套。'},
+{q:'设置 box-sizing: border-box 后，width: 200px 表示？',opts:['content + padding + border 总共 200px','仅内容区 200px','200px 之外还要加 margin','盒子固定 200px 不可缩放'],ans:0,
+why:'border-box 模式下，width 一口价全包 content + padding + border，算尺寸不用再加加减减。',tip:'border-box 一口价，width 就是全包价。'},
+{q:'默认 content-box 下：width 100px、padding 10px、border 5px，盒子实际占宽多少？',opts:['130px','100px','120px','115px'],ans:0,
+why:'实际宽度 = width + 左右 padding + 左右 border = 100 + 10×2 + 5×2 = 130px。',tip:'content-box 加法题：宽 + 距 + 框，左右各算两份。'}
+],
+summary:[
+'迷宫贯通！盒模型已被你拆得明明白白！知识清单——',
+'① 四层结构：content → padding → border → margin',
+'② padding 屋里留白，margin 对外社交',
+'③ border-box 一口价，content-box 做加法',
+'手机、手机壳、快递盒的类比，讲给面试官听都够了！',
+'下一站：「布局虫洞」——元素们将在时空扭曲中排队！'
+]
+},
+/* ========== 第 7 关：布局虫洞 ========== */
+{
+name:'布局虫洞',theme:'CSS 布局：Flex 布局、position 定位、单位',color:'#b48cff',
+intro:[
+'前方是时空扭曲的「布局虫洞」！元素们在这里排队、悬浮、叠罗汉！',
+'现代布局神器：Flex 弹性布局——给父容器设 display: flex，子元素立刻自动排队。',
+'justify-content 管主轴对齐：center 居中、space-between 两端对齐、flex-end 尾部对齐。',
+'align-items 管交叉轴方向的对齐——默认横排时，justify 管左右，align 管上下！',
+'position 定位四兄弟：static 默认流、relative 相对原位、absolute 绝对定位、fixed 钉死在屏幕上。',
+'absolute 会向上找「最近的已定位祖先」当参照物；fixed 永远相对浏览器窗口，滚动也不动。',
+'单位三家族也要分清：px 固定像素、em 相对父元素字号、rem 相对根元素 html 的字号。',
+'虫洞怪兽正在打乱一切布局，用 Flex 和定位知识修复航道！'
+],
+questions:[
+{q:'开启 Flex 弹性布局，display: flex 应该设置在哪个元素上？',opts:['父元素（容器）','子元素','任意元素都一样','body 上才行'],ans:0,
+why:'display: flex 设在父容器上，它的直接子元素变成「弹性项目」自动排队；给子元素设置是另一回事。',tip:'老爸 flex 开导航，儿子们自动列队。'},
+{q:'Flex 布局中，让子元素在「主轴」上居中对齐，用哪个？',opts:['`justify-content: center`','`align-items: center`','`text-align: center`','`float: center`'],ans:0,
+why:'justify-content 管主轴（默认水平方向）对齐；align-items 管交叉轴；float 没有 center 值。',tip:'justify 管主轴排队，align 管交叉轴站姿。'},
+{q:'想让元素「固定在浏览器窗口」，滚动条怎么滚都不动，position 用哪个值？',opts:['fixed','absolute','relative','sticky'],ans:0,
+why:'fixed 相对浏览器窗口定位，常用于吸顶导航、悬浮客服按钮；absolute 相对定位祖先。',tip:'fixed 钉在屏幕上，absolute 找定位爹。'},
+{q:'rem 单位的参照物是谁？',opts:['根元素 html 的字号','父元素的字号','浏览器窗口宽度','固定 16px 不变'],ans:0,
+why:'rem = root em，相对根元素 html 的 font-size 计算；em 才是相对父元素（或自身）字号。',tip:'r 是 root，rem 认 html 当干爹。'},
+{q:'position: absolute 的元素，一般情况下会相对谁定位？',opts:['最近的已定位祖先元素','永远相对 body','永远相对浏览器窗口','相对它自己'],ans:0,
+why:'absolute 向上找最近的 position 非 static 的祖先当参照；祖先都没定位，才相对初始包含块（页面）。',tip:'absolute 找最近的定位爹，爹没定位就认 html。'},
+{q:'下列哪个单位会随「父元素字号」变化而变化？',opts:['em','px','rem','pt'],ans:0,
+why:'em 相对父元素字号；rem 相对根元素；px 是固定像素——em 看爹脸色，rem 只认老祖宗。',tip:'em 看爹脸色，rem 认 html 老祖宗。'}
+],
+summary:[
+'虫洞穿越成功！布局魔法入手！知识清单——',
+'① Flex：父容器 display:flex，justify 管主轴、align 管交叉轴',
+'② 定位：fixed 钉屏幕、absolute 找定位爹、relative 占原位',
+'③ 单位：px 固定、em 靠爹、rem 靠 html',
+'布局是 CSS 的半壁江山，你已经跨过最难的一道坎！',
+'下一站：「JS 行星」——前端宇宙的大脑，真正的编程开始！'
+]
+},
+/* ========== 第 8 关：JS 行星 ========== */
+{
+name:'JS 行星',theme:'JavaScript 入门：变量、数据类型、运算符',color:'#ffe94d',
+intro:[
+'穿过布局虫洞，抵达「JS 行星」——前端宇宙的大脑所在！',
+'JavaScript 是一门真正的编程语言，让网页拥有了「交互与逻辑」。',
+'声明变量三兄弟：var（老古董，能重复声明，慎用）、let（可变）、const（不可变）。',
+'ES6 之后都推荐 let 和 const——const 声明后不能重新赋值，一锤定音！',
+'基本数据类型：Number 数字、String 字符串、Boolean 布尔、Undefined、Null……',
+'typeof 可以检测类型，但有个祖传冷笑话：typeof null 返回 "object"，是 20 多年没修的历史 bug！',
+'比较运算符重点：== 会偷偷转换类型，=== 严格相等——类型和值都必须一样。',
+'JS 行星是 Bug 怪兽的老巢，毕竟人家的名字就叫 Bug 之王……准备好迎接真正的战斗！'
+],
+questions:[
+{q:'声明一个「之后不能重新赋值」的变量，用哪个关键字？',opts:['const','let','var','function'],ans:0,
+why:'const 声明常量，重新赋值会直接报错；let 声明的变量可以改；var 是老式写法不推荐。',tip:'let 随便改，const 一锤定音。'},
+{q:'typeof "hello" 的结果是？',opts:['"string"','"text"','"char"','"word"'],ans:0,
+why:'字符串的类型名是 string，数字是 number——这俩是出现频率最高的类型。',tip:'字符串 string，数字 number，先记牢这俩。'},
+{q:'下列哪个值是 Boolean 布尔类型？',opts:['true','"true"','1','True'],ans:0,
+why:'true / false（全小写）是布尔值；"true" 带引号是字符串；大写 True 是未定义变量，会报错！',tip:'布尔只有 true 和 false，引号一加变字符串。'},
+{q:'1 == "1" 和 1 === "1" 的结果分别是？',opts:['true 和 false','true 和 true','false 和 false','false 和 true'],ans:0,
+why:'== 会把 "1" 隐式转成数字 1 再比较，所以相等；=== 先比类型，数字 vs 字符串直接不相等。',tip:'两个等号爱撮合，三个等号讲原则。'},
+{q:'下列哪个是合法的变量名？',opts:['myName','2name','my-name','let'],ans:0,
+why:'变量名不能以数字开头、不能含连字符 -、不能用保留字 let；myName 是标准的驼峰命名。',tip:'字母开头、驼峰命名、别撞保留字。'},
+{q:'typeof null 的结果是？',opts:['"object"','"null"','"undefined"','"number"'],ans:0,
+why:'这是 JS 保留 20 多年的历史 bug：typeof null 返回 "object" 而不是 "null"，面试高频题！',tip:'null 冒充 object，祖传 bug 别指望修了。'}
+],
+summary:[
+'JS 行星首战告捷！知识清单——',
+'① 变量三兄弟：var 老古董、let 可变、const 不可变',
+'② 类型：string / number / boolean，typeof 来检测',
+'③ == 宽松比较会转型，=== 严格比较看血统',
+'typeof null 的祖传 bug 也收入囊中了，面试官都会夸你！',
+'下一站：「逻辑小行星带」——用 if 和 for 规划航线！'
+]
+},
+/* ========== 第 9 关：逻辑小行星带 ========== */
+{
+name:'逻辑小行星带',theme:'JS 流程控制：if 判断、for / while 循环',color:'#64d9ff',
+intro:[
+'前方小行星密布！必须用「逻辑」规划航线，否则会撞得头破血流！',
+'if / else if / else：条件判断，程序世界的三岔路口。',
+'比较运算符返回布尔值：>、<、>=、<=、===、!==。',
+'for 循环三段式：for (初始化; 条件; 更新)，例如 for (let i = 0; i < 10; i++)。',
+'while 循环：先判断条件再执行，条件变 false 才退出。',
+'两个跳出关键字要分清：break 立刻砸门跳出整个循环；continue 只翘掉本节课，下次还来。',
+'小心死循环：while (true) 里面没有 break，就是宇宙黑洞，进去就出不来！',
+'还有个经典陷阱再提醒一次：=== 严格相等，数字 5 和字符串 "5" 不相等！',
+'用你的逻辑之光，清除小行星带的所有怪兽！'
+],
+questions:[
+{q:'执行下列代码，输出什么？\n`let x = 10;`\n`if (x > 5) { console.log("A"); } else { console.log("B"); }`',opts:['A','B','AB','什么都不输出'],ans:0,
+why:'x = 10 > 5 条件成立，走 if 分支输出 A，else 分支被直接跳过。',tip:'条件真走 if，条件假走 else。'},
+{q:'for (let i = 0; i < 3; i++) 的循环体一共执行几次？',opts:['3 次','2 次','4 次','无限次'],ans:0,
+why:'i 依次取 0、1、2，三次满足 i < 3；当 i = 3 时条件不成立，循环结束。',tip:'从 0 数到 2，正好转满 3 圈。'},
+{q:'想在循环中「跳过本轮、继续下一轮」，用哪个关键字？',opts:['continue','break','return','skip'],ans:0,
+why:'continue 结束当前这一轮直接进入下一轮；break 是直接跳出整个循环。',tip:'continue 请假一节课，break 直接退学。'},
+{q:'执行下列代码，输出什么？\n`for (let i = 1; i <= 3; i++) {`\n`  if (i === 2) continue;`\n`  console.log(i);`\n`}`',opts:['1 3','1 2 3','2','1'],ans:0,
+why:'i = 2 时 continue 跳过了本轮的 console.log，但 1 和 3 正常打印，所以输出 1 3。',tip:'continue 只翘本节课，下次照样来。'},
+{q:'什么情况下 while 循环会变成「死循环」？',opts:['条件永远为 true 且没有 break','条件为 false','循环体是空的','使用了 let 声明变量'],ans:0,
+why:'条件恒真又没有 break / return 退出，循环永不结束，页面会被卡死——写循环前先找好出口！',tip:'写 while 先找出口，不然黑洞吃到饱。'},
+{q:'执行下列代码，输出什么？\n`let a = 5;`\n`if (a === "5") { console.log("相等"); }`\n`else { console.log("不相等"); }`',opts:['不相等','相等','报错','什么都不输出'],ans:0,
+why:'5 是 Number 类型，"5" 是 String 类型；=== 先比类型，类型不同直接判不相等。',tip:'=== 先验血统再比实力。'}
+],
+summary:[
+'小行星带 cleared！逻辑引擎全速运转！知识清单——',
+'① if / else：条件真走 if，假走 else',
+'② for 三段式：初始化; 条件; 更新——i 从 0 开始转 N 圈',
+'③ break 砸门退学，continue 翘一节课',
+'④ 防死循环：先找出口再写循环',
+'指挥官的逻辑力已认证，怪物们的花招骗不到你！',
+'下一站：「函数反应堆」——能量与复用的艺术！'
+]
+},
+/* ========== 第 10 关：函数反应堆 ========== */
+{
+name:'函数反应堆',theme:'JS 函数与数组：函数定义、常用数组方法',color:'#ff6bd6',
+intro:[
+'「函数反应堆」是 JS 行星的核心能量站——函数就是可复用的能量块！',
+'函数声明：function greet() {}，函数调用：greet()——不调用就永远不执行！',
+'参数是函数的输入，return 是函数的输出；没写 return 的函数，默认返回 undefined。',
+'ES6 箭头函数超简洁：const add = (a, b) => a + b，一行顶过去五行！',
+'数组是有序的数据集合：let arr = [1, 2, 3]，注意下标从 0 开始！',
+'数组四小龙：push 尾部添加、pop 尾部删除、shift 头部删除、unshift 头部添加。',
+'还有两个高阶方法神器：map 把每个元素加工成新数组，filter 按条件筛选出新数组。',
+'它们都不改动原数组，返回全新的数组——这是函数式编程的好习惯！',
+'反应堆能量不稳，用函数知识稳住它！'
+],
+questions:[
+{q:'下列哪种是正确的函数声明？',opts:['`function sayHi() { }`','`function: sayHi() { }`','`def sayHi() { }`','`func sayHi() { }`'],ans:0,
+why:'JS 用 function 关键字 + 函数名 + () + {} 声明函数；def 是 Python 的，func 是 Go / Swift 的。',tip:'function 打头，名字跟上，括号花括号收尾。'},
+{q:'一个函数中没有写 return，调用它时返回什么？',opts:['undefined','null','0','直接报错'],ans:0,
+why:'没有 return（或 return 后面为空）的函数，默认返回 undefined——等于白打工一场空。',tip:'不写 return，白打工一场空。'},
+{q:'const add = (a, b) => a + b; 执行 add(2, 3) 的结果是？',opts:['5','23','undefined','报错'],ans:0,
+why:'箭头函数 (a, b) => a + b 表示接收 a、b，返回它们的和：2 + 3 = 5。',tip:'胖箭头 => 后面就是返回值。'},
+{q:'数组 let arr = [10, 20, 30]，arr[1] 的值是？',opts:['20','10','30','undefined'],ans:0,
+why:'数组下标从 0 开始：arr[0] 是 10、arr[1] 是 20、arr[2] 是 30。',tip:'数组从 0 报数，第一个住 0 号房。'},
+{q:'想在数组「末尾」添加一个元素，用哪个方法？',opts:['push()','pop()','shift()','slice()'],ans:0,
+why:'push 尾部添加、pop 尾部删除、shift 头部删除、unshift 头部添加——推尾巴、弹尾巴、削头、插头。',tip:'push 压尾 pop 弹尾，shift 削头 unshift 插头。'},
+{q:'[1, 2, 3].map(n => n * 2) 的结果是？',opts:['[2, 4, 6]','[1, 2, 3]','6','[1, 4, 9]'],ans:0,
+why:'map 把每个元素送进函数加工后返回全新数组：1→2、2→4、3→6，原数组不变。',tip:'map 是流水线，每个产品加工一遍。'}
+],
+summary:[
+'反应堆稳定运行！知识清单——',
+'① 函数：function 声明、() 调用、return 返回（默认 undefined）',
+'② 箭头函数：(a, b) => a + b，一行搞定',
+'③ 数组下标从 0 开始；push / pop / shift / unshift 四小龙',
+'④ map 加工、filter 筛选，都返回新数组不动原件',
+'复用是程序员的浪漫，你已经掌握了！',
+'下一站：「DOM 风暴带」——让 JS 真正触碰网页！'
+]
+},
+/* ========== 第 11 关：DOM 风暴带 ========== */
+{
+name:'DOM 风暴带',theme:'JS 操作网页：DOM 查询、事件监听、修改内容',color:'#9dff57',
+intro:[
+'最危险的「DOM 风暴带」！网页在这里被 JS 随意操控！',
+'DOM 就是文档对象模型：浏览器把 HTML 解析成一棵「节点树」，树上有 document、元素、文本节点。',
+'查询元素三剑客：getElementById("id")、querySelector("选择器")、querySelectorAll("选择器")。',
+'querySelector 用 CSS 选择器语法找元素，比如 .box 找类、#box 找 ID——但只返回第一个！',
+'修改内容三板斧：textContent 改纯文本、innerHTML 塞 HTML、style.xxx 改行内样式。',
+'事件监听：元素.addEventListener("click", 函数)——点击就触发，这是交互的灵魂！',
+'常见事件：click 点击、input 输入、mouseover 悬停、keydown 按键、load 加载完成。',
+'风暴眼守卫着通往最终 Boss 的航道，突破它！'
+],
+questions:[
+{q:'想获取 id 为 "box" 的元素，正确的写法是？',opts:['`document.getElementById("box")`','`document.getId("box")`','`document.querySelector("box")`','`document.findElement("box")`'],ans:0,
+why:'getElementById 直接传 id 名，不加 #；querySelector 才用 CSS 选择器语法，要写 #box。',tip:'ById 裸名点人，querySelector 按 CSS 规矩加 #。'},
+{q:'document.querySelector(".item") 会选中什么？',opts:['第一个 class 为 item 的元素','所有 class 为 item 的元素','id 为 item 的元素','标签名叫 item 的元素'],ans:0,
+why:'querySelector 只返回第一个匹配的元素；想拿全部要用 querySelectorAll，它返回节点列表。',tip:'querySelector 见好就收，All 才全抓。'},
+{q:'修改元素的「纯文字内容」，推荐用哪个属性？',opts:['textContent','innerHTML','textValue','content'],ans:0,
+why:'textContent 设置纯文本，安全高效；innerHTML 会解析 HTML 标签，有 XSS 安全风险，塞可信内容才用它。',tip:'纯文字 textContent，塞标签才 innerHTML。'},
+{q:'给按钮 btn 绑定点击事件，正确的写法是？',opts:['`btn.addEventListener("click", fn)`','`btn.addEvent("click", fn)`','`btn.onClick(fn)`','`btn.listen("click", fn)`'],ans:0,
+why:'标准写法：元素.addEventListener(事件名, 处理函数)；同一个元素还能绑多个监听器。',tip:'加个 listener，事件一来就喊你。'},
+{q:'用户在输入框里「打字」时，触发的事件是？',opts:['input','click','submit','load'],ans:0,
+why:'每敲一个键触发一次 input；click 是点击；change 要等失焦且值改变才触发。',tip:'打字触发 input，点按触发 click。'},
+{q:'想用 JS 把元素隐藏，正确的操作是？',opts:['`el.style.display = "none"`','`el.display = "none"`','`el.style.hidden = true`','`el.css("display", "none")`'],ans:0,
+why:'JS 改行内样式走 el.style.属性名 = 值；display: none 让元素消失且不占位。',tip:'style 一改，行内样式立刻生效。'}
+],
+summary:[
+'风暴带突破！你已能随心操控网页！知识清单——',
+'① 查询：getElementById / querySelector(All)',
+'② 修改：textContent 纯文本、innerHTML 塞标签、style 改样式',
+'③ 事件：addEventListener("click", fn)，交互的灵魂',
+'「查 → 改 → 绑」三步走，网页在你手里活了起来！',
+'下一站就是最终决战：「全栈黑洞」——HTML + CSS + JS 综合大考！'
+]
+},
+/* ========== 第 12 关：终极 Boss ========== */
+{
+name:'全栈黑洞',theme:'终极 Boss：HTML + CSS + JS 前端综合难题',color:'#ff3d3d',
+intro:[
+'终于抵达前端宇宙的中心——「全栈黑洞」！',
+'黑洞 Boss 吞噬了 HTML、CSS、JS 三大星域的知识精华，是最终试炼！',
+'它将祭出横跨三大主题的综合难题，只有真正的全栈战士能战胜它！',
+'最后检查一遍武器库：结构靠 HTML，样式靠 CSS，交互靠 JS。',
+'语义化让代码有灵魂，盒模型让布局有秩序，DOM 让页面有生命。',
+'=== 的原则、flex 的排队、事件的触发……都还记得吗？',
+'指挥官，这是最后一战！消灭 Boss，你就是前端宇宙的传说！',
+'全速前进！！！'
+],
+questions:[
+{q:'一个按钮点击后弹出提示框，需要哪两项技术组合？',opts:['HTML 的 `<button>` + JS 的事件监听','CSS 的 hover + HTML 的 `<img>`','JS 的变量 + CSS 的颜色','HTML 的 `<input>` + CSS 的字体'],ans:0,
+why:'按钮靠 HTML 的 <button> 造出来，点击响应靠 JS 的 addEventListener，CSS 只负责美化——三剑客各司其职。',tip:'HTML 造人，CSS 化妆，JS 赋予灵魂。'},
+{q:'`document.querySelector("#title").textContent = "你好";` 这行代码涉及的知识是？',opts:['DOM 查询 + 修改内容','CSS 盒模型','HTML 表单','JS 循环'],ans:0,
+why:'querySelector 按 #title 查元素，textContent 改文字——DOM 操作最经典的「查 → 改」两步曲。',tip:'一查二改，DOM 操作基本法。'},
+{q:'想让一个 div 里的多个子元素「横向排列且两端对齐」，最佳方案是？',opts:['`display: flex; justify-content: space-between`','`float: left`','`position: absolute`','`display: block`'],ans:0,
+why:'父容器一行 flex 开启弹性布局，justify-content: space-between 让首尾贴边、中间均分——现代布局首选。',tip:'弹性布局一条龙：先 flex 再 justify。'},
+{q:'网页中一张图片显示不出来，最先应该检查什么？',opts:['img 的 src 路径是否正确','页面的标题写没写','body 的背景色','a 标签的 href'],ans:0,
+why:'图片不显示 90% 是 src 出错：路径写错、文件名拼错、后缀不对——先审 src，最快定位。',tip:'图片失踪案，先审 src 路径。'},
+{q:'下列关于三剑客分工的说法，正确的是？',opts:['HTML 管结构、CSS 管样式、JS 管交互','HTML 管样式、CSS 管结构、JS 管样式','CSS 管交互、JS 管结构、HTML 管逻辑','三者都只管样式'],ans:0,
+why:'铁三角分工：HTML 搭骨架（结构）、CSS 造颜值（样式）、JS 注入灵魂（交互）——前端世界的第一性原理！',tip:'结构 HTML、样式 CSS、交互 JS，焊死！'},
+{q:'最终题：`const box = document.querySelector(".box");`\n`box.addEventListener("click", () => {`\n`  box.style.background = "red";`\n`});` 点击后会发生什么？',opts:['.box 元素背景变红','页面直接报错','什么都不发生','全页所有元素背景变红'],ans:0,
+why:'查询 .box → 绑定 click → 点击时改背景色。「查、绑、改」三步一气呵成——这就是前端交互的本质！',tip:'查绑改三字诀，你就是全栈战士了！'}
+],
+summary:[
+'黑洞 Boss 被击败！前端宇宙恢复了和平！！',
+'恭喜你，指挥官！你完成了全部 12 个星域的知识试炼！',
+'最终兵器库盘点：HTML 搭骨架、CSS 造颜值、JS 注入灵魂。',
+'语义化是灵魂、盒模型是秩序、DOM 是生命线、=== 是原则。',
+'毕业不是终点——真正的战场，叫「项目实战」。',
+'小C 会永远在你身边导航。去创造属于你的前端宇宙吧！毕业快乐！'
+]
+},
+];
+
+/* 星图节点坐标（900×478 画布内） */
+const MAP_POS=[[95,405],[185,345],[150,250],[255,185],[365,235],[465,165],[565,215],[665,150],[765,205],[835,285],[745,355],[845,425]];
+
+/* ---------------- 小C 台词池 ---------------- */
+const PRAISE=['漂亮！一击命中！','Bingo！怪兽当场爆炸！','稳！这题你闭着眼都会！','知识雷达全开，太强了！','教科书级操作，收下我的膝盖！','怪兽：我还没反应过来就没了！'];
+const ENCOURAGE=['别灰心！大神也是从 bug 堆里爬出来的！','差一点点！这个陷阱记住就是赚到！','没关系，错题是最好的老师，先让怪兽得意一下！','这题是经典坑，栽过一次就长记性了！','程序员定律：今天的 bug 是明天的经验值！','重启大法虽迟但到——重新集结，再战！'];
+const DEFEAT_LINES=['飞船护盾告急…但知识不会白学！重整旗鼓，再战一次！','胜败乃兵家常事，删库跑路才是失败！再来！','怪兽只是暂时占了上风，你的经验条已经涨了！','深呼吸，debug 三步走：重启、重试、重新做人！'];
+
+/* ---------------- 存档（localStorage 持久化） ---------------- */
+const SAVE_KEY='feGalaxySave';
+function loadSave(){
+  try{
+    const d=JSON.parse(localStorage.getItem(SAVE_KEY));
+    if(d&&d.unlocked>=1)return d;
+  }catch(e){}
+  return {unlocked:1,best:Array(12).fill(0),cleared:Array(12).fill(false)};
+}
+function storeSave(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(G.save));}catch(e){}}
+
+/* ---------------- 全局游戏状态 ---------------- */
+const G={
+  state:'title',        // title/map/intro/battle/feedback/summary/clear/defeat
+  li:0, qi:0,           // 当前关卡下标 / 当前题目下标
+  hp:3, score:0, streak:0, maxStreak:0,
+  monsters:[], ship:{x:480,y:352,tx:480,flash:0},
+  lasers:[], bolts:[], parts:[], floats:[],
+  shake:0, answered:false, token:0,   // token 用于作废旧关卡遗留的定时器
+  save:loadSave(),
+};
+const isBoss=()=>G.li===11;
+/* 带关卡令牌的延时调用：关卡切换后自动失效 */
+function after(ms,fn){const tk=G.token;setTimeout(()=>{if(tk===G.token)fn();},ms);}
+
+/* ---------------- 小C 对话系统（打字机） ---------------- */
+const Dlg={
+  lines:[],li:0,ci:0,typing:false,active:false,onDone:null,timer:null,
+  show(lines,onDone){
+    this.lines=lines.map(s=>String(s).replace(/`/g,''));  // 去掉代码标记
+    this.li=0;this.ci=0;this.typing=true;this.active=true;this.onDone=onDone;
+    $('#dlg').classList.add('show');
+    $('#dlg').classList.toggle('up',$('#qpanel').classList.contains('show'));
+    $('#d-next').style.display='none';
+    this.startType();
+  },
+  startType(){
+    clearInterval(this.timer);
+    const txt=this.lines[this.li];
+    const el=$('#d-text');
+    this.timer=setInterval(()=>{
+      this.ci++;
+      el.textContent=txt.slice(0,this.ci)+(this.ci<txt.length?'▌':'');
+      if(this.ci%3===0)Snd.blip();
+      if(this.ci>=txt.length)this.finishLine();
+    },30);
+  },
+  finishLine(){
+    clearInterval(this.timer);this.typing=false;
+    $('#d-text').textContent=this.lines[this.li];
+    $('#d-next').style.display='block';
+  },
+  advance(){
+    if(!this.active)return;
+    if(this.typing){this.ci=this.lines[this.li].length;this.finishLine();return;}
+    if(this.li<this.lines.length-1){
+      this.li++;this.ci=0;this.typing=true;
+      $('#d-next').style.display='none';
+      this.startType();
+    }else{
+      this.hide();
+      const cb=this.onDone;this.onDone=null;
+      if(cb)cb();
+    }
+  },
+  hide(){clearInterval(this.timer);this.active=false;$('#dlg').classList.remove('show');$('#d-next').style.display='none';}
+};
+
+/* ---------------- 屏幕切换 ---------------- */
+function showScreen(id){
+  $$('.screen').forEach(s=>s.classList.remove('show'));
+  if(id)$(id).classList.add('show');
+}
+function setHud(v){$('#hud').classList.toggle('show',v);}
+
+/* ---------------- HUD ---------------- */
+function updateHUD(){
+  const L=LEVELS[G.li];
+  $('#hud-lv').textContent=`第${G.li+1}关 · ${L.name}`;
+  const segs=$('#hud-hp').children;
+  for(let i=0;i<3;i++){
+    const on=i<G.hp;
+    segs[i].className=on?(G.hp===1?'on crit':G.hp===2?'on low':'on'):'';
+  }
+  $('#hud-score').textContent=pad(G.score);
+  $('#hud-en').textContent=`× ${LEVELS[G.li].questions.length-G.qi}`;
+  /* 小怪兽图标 */
+  const mc=$('#hud-micon'),c=mc.getContext('2d');
+  c.imageSmoothingEnabled=false;c.clearRect(0,0,30,22);
+  if(isBoss())drawSprTo(c,BOSS,1,1,1.5);
+  else drawSprTo(c,sprite(BUG_ROWS[0],{A:L.color,E:'#fff'}),4,3,2);
+}
+
+/* ---------------- 战斗系统 ---------------- */
+function buildMonsters(){
+  const L=LEVELS[G.li];
+  G.monsters=[];
+  if(isBoss()){
+    /* Boss 关：单只大怪兽，6 题各命中一次 */
+    G.monsters.push({x:480,y:138,alive:true,isBoss:true,esc:false,escT:0,flash:0,bob:0,spr:BOSS,s:7});
+    return;
+  }
+  const n=L.questions.length,gap=86,x0=480-(n-1)*gap/2;
+  for(let i=0;i<n;i++){
+    G.monsters.push({
+      x:x0+i*gap,y:118,alive:true,isBoss:false,esc:false,escT:0,flash:0,
+      bob:i*1.13,v:i%3,s:sprite(BUG_ROWS[i%3],{A:L.color,E:'#ffffff'}),sc:4
+    });
+  }
+}
+function activeMonster(){return G.monsters[isBoss()?0:G.qi];}
+
+function showQuestion(){
+  const L=LEVELS[G.li],q=L.questions[G.qi];
+  $('#qprog').textContent=`Q${G.qi+1}/${L.questions.length}`;
+  $('#qtheme').textContent=L.theme;
+  $('#qtext').innerHTML=fmt(q.q);
+  const box=$('#qopts');box.innerHTML='';
+  q.opts.forEach((o,i)=>{
+    const b=document.createElement('button');
+    b.className='opt';
+    b.innerHTML=`<span class="k">[${i+1}]</span><span>${fmt(o)}</span>`;
+    b.onclick=()=>answer(i);
+    box.appendChild(b);
+  });
+  $('#qpanel').classList.add('show');
+  $('#qpanel').classList.remove('lock');
+  updateHUD();
+}
+
+/* 玩家作答（k: 0-3） */
+function answer(k){
+  if(G.state!=='battle'||G.answered)return;
+  const q=LEVELS[G.li].questions[G.qi];
+  if(k<0||k>3)return;
+  G.answered=true;
+  Snd.select();
+  $('#qpanel').classList.add('lock');
+  const opts=$$('#qopts .opt');
+  opts.forEach(o=>o.classList.add('dim'));
+  opts[k].classList.remove('dim');
+  const m=activeMonster();
+  if(k===q.ans){
+    opts[k].classList.add('right');
+    resolveCorrect(q,m);
+  }else{
+    opts[k].classList.add('wrong');
+    opts[q.ans].classList.add('right');
+    resolveWrong(q,m,k);
+  }
+}
+
+/* 答对：飞船横移瞄准 → 发射激光 → 怪兽爆炸 */
+function resolveCorrect(q,m){
+  G.streak++;G.maxStreak=Math.max(G.maxStreak,G.streak);
+  G.ship.tx=m.x;                     // 飞船移动到怪兽正下方
+  after(360,()=>{
+    Snd.laser();
+    G.lasers.push({x:G.ship.x,y:G.ship.y-26,vy:-1500});
+  });
+  after(560,()=>laserHit(m));        // 命中结算由定时器驱动（不依赖帧循环，后台标签页也生效）
+  after(1150,()=>showFeedback(true,q,-1));
+}
+/* 答错：怪兽反击 → 飞船扣血，怪兽逃走 */
+function resolveWrong(q,m,k){
+  G.streak=0;
+  Snd.wrong();
+  after(420,()=>{
+    /* 怪兽发射紫色能量弹 */
+    G.bolts.push({x:m.x,y:m.y+22,vy:640,vx:(G.ship.x-m.x)/.48});
+    if(!m.isBoss)m.esc=true;         // 普通怪兽得意逃走（Boss 不逃）
+  });
+  after(780,()=>shipHit());          // 受击结算同样由定时器驱动
+  after(1200,()=>showFeedback(false,q,k));
+}
+
+/* 激光命中处理 */
+function laserHit(m){
+  Snd.explode();
+  const L=LEVELS[G.li];
+  const last=G.qi>=L.questions.length-1;
+  if(m.isBoss&&!last){
+    /* Boss 未到最后题：只受创不死亡 */
+    m.flash=1;G.shake=Math.max(G.shake,7);
+    explosion(m.x+rnd(-40,40),m.y+rnd(-20,20),'#ff2030',14,200);
+  }else{
+    m.alive=false;
+    explosion(m.x,m.y,isBoss()?'#9b30ff':L.color,isBoss()?46:26,isBoss()?340:260);
+    if(isBoss())G.shake=Math.max(G.shake,18);
+  }
+  const add=100+(G.streak-1)*20;
+  G.score+=add;
+  G.floats.push({x:m.x,y:m.y-26,txt:`+${add}`,c:'#ffe14d',life:1});
+  if(G.streak>1)G.floats.push({x:m.x,y:m.y-8,txt:`COMBO x${G.streak}`,c:'#ff6bd6',life:1});
+  G.ship.tx=480;                     // 飞船归位
+  updateHUD();
+}
+/* 能量弹命中飞船 */
+function shipHit(){
+  const m=activeMonster();
+  if(m&&!m.isBoss)m.esc=true;        // 保险：答错怪兽一定逃走
+  G.hp--;G.ship.flash=1;
+  G.shake=Math.max(G.shake,12);
+  Snd.hit();
+  explosion(G.ship.x,G.ship.y,'#ff4060',16,220);
+  updateHUD();
+  if(G.hp<=0){
+    after(650,()=>defeat());
+  }
+}
+/* 爆炸粒子 */
+function explosion(x,y,color,n=26,spd=260){
+  for(let i=0;i<n;i++){
+    const a=Math.random()*Math.PI*2,v=rnd(.25,1)*spd;
+    G.parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:rnd(.35,.85),max:.85,c:Math.random()<.35?'#ffffff':color,s:rnd(2,5)});
+  }
+}
+
+/* 每题后的讲解对话（对错都有） */
+function buildFeedback(ok,q,k){
+  const letter='ABCD'[q.ans];
+  if(ok)return [pick(PRAISE),`【解析】${q.why}`,q.tip?`【口诀】${q.tip}`:''];
+  return [`正确答案是【${letter}】。${pick(ENCOURAGE)}`,`【解析】${q.why}`,q.tip?`【口诀】${q.tip}`:''].filter(Boolean);
+}
+function showFeedback(ok,q,k){
+  if(G.hp<=0)return;                 // 已失败则不再弹讲解
+  G.state='feedback';
+  Dlg.show(buildFeedback(ok,q,k),()=>nextQuestion());
+}
+function nextQuestion(){
+  G.qi++;
+  const L=LEVELS[G.li];
+  if(G.qi>=L.questions.length){levelClear();return;}
+  G.answered=false;
+  G.state='battle';
+  showQuestion();
+}
+
+/* ---------------- 通关 / 失败 ---------------- */
+function levelClear(){
+  G.state='summary';
+  $('#qpanel').classList.remove('show');   // 通关总结时收起答题面板
+  Snd.bgmStop();Snd.victory();
+  const bonus=G.hp*50;
+  if(bonus>0){G.score+=bonus;updateHUD();}
+  Dlg.show(LEVELS[G.li].summary,()=>finishLevel());
+}
+function finishLevel(){
+  /* 写入存档 */
+  const i=G.li;
+  G.save.cleared[i]=true;
+  G.save.unlocked=Math.max(G.save.unlocked,Math.min(12,i+2));
+  G.save.best[i]=Math.max(G.save.best[i],G.score);
+  storeSave();
+  if(i===11){showEnd('final');return;}
+  showEnd('clear');
+}
+function defeat(){
+  G.token++;                         // 作废所有进行中的动画定时器
+  G.state='defeat';
+  Snd.bgmStop();Snd.fail();
+  showEnd('defeat');
+}
+
+/* 结算画面（clear 通关 / defeat 失败 / final 毕业） */
+function showEnd(type){
+  setHud(false);$('#qpanel').classList.remove('show');
+  showScreen('#scr-end');
+  const btns=$('#end-btns');btns.innerHTML='';
+  const mkBtn=(txt,cls,fn)=>{const b=document.createElement('button');b.className='pxbtn '+(cls||'');b.textContent=txt;b.onclick=fn;btns.appendChild(b);};
+  if(type==='clear'){
+    $('#end-ico').textContent='★';
+    $('#end-title').textContent='LEVEL CLEAR!';
+    $('#end-title').style.textShadow='4px 4px 0 #0a9a55';
+    $('#end-sub').innerHTML=`「${LEVELS[G.li].name}」已净化！<br>下一星域已在星图上点亮，指挥官！`;
+    $('#end-stats').innerHTML=`本关得分 <b>${G.score}</b>（含护盾奖励 +${G.hp*50}）<br>最大连击 <b>x${G.maxStreak}</b>　剩余护盾 <b>${G.hp}</b>`;
+    mkBtn('下一关 →','',()=>startLevel(G.li+1));
+    mkBtn('返回星图','warn',goMap);
+  }else if(type==='defeat'){
+    $('#end-ico').textContent='✖';
+    $('#end-title').textContent='MISSION FAILED';
+    $('#end-title').style.textShadow='4px 4px 0 #a02040';
+    $('#end-sub').innerHTML=`护盾耗尽，飞船紧急弹射！<br>小C：${pick(DEFEAT_LINES)}`;
+    $('#end-stats').innerHTML=`坚持到第 <b>${G.qi+1}/${LEVELS[G.li].questions.length}</b> 题　当前得分 <b>${G.score}</b>`;
+    mkBtn('重新挑战','',()=>startLevel(G.li));
+    mkBtn('返回星图','warn',goMap);
+  }else{
+    const total=G.save.best.reduce((a,b)=>a+b,0);
+    $('#end-ico').textContent='✦';
+    $('#end-title').textContent='全栈毕业！';
+    $('#end-title').style.textShadow='4px 4px 0 #b44dff';
+    $('#end-sub').innerHTML=`黑洞 Boss 被击败，前端宇宙恢复和平！<br>小C：指挥官，你完成了全部 12 个星域的试炼——<br>HTML 搭骨架、CSS 造颜值、JS 注入灵魂，三剑客已被你收入麾下！<br>毕业不是终点，真正的战场叫「项目实战」。毕业快乐！`;
+    $('#end-stats').innerHTML=`本关得分 <b>${G.score}</b>　累计最佳 <b>${total}</b>`;
+    mkBtn('返回星图','',goMap);
+    mkBtn('再战 Boss','warn',()=>startLevel(11));
+  }
+}
+
+/* ---------------- 关卡流程 ---------------- */
+function startLevel(i){
+  G.token++;
+  G.li=i;G.qi=0;G.hp=3;G.score=0;G.streak=0;G.maxStreak=0;G.answered=false;
+  G.lasers=[];G.bolts=[];G.parts=[];G.floats=[];G.shake=0;
+  G.ship.x=480;G.ship.tx=480;G.ship.flash=0;
+  buildMonsters();
+  showScreen(null);
+  setHud(true);
+  updateHUD();
+  G.state='intro';
+  /* 关卡开场剧情对话（含本关知识预习），完毕后进入战斗 */
+  Dlg.show(LEVELS[i].intro,()=>{
+    G.state='battle';
+    Snd.bgmStart();
+    showQuestion();
+  });
+}
+function goMap(){
+  G.token++;
+  G.state='map';
+  Snd.bgmStop();
+  G.lasers=[];G.bolts=[];G.parts=[];G.floats=[];G.shake=0;   // 清空战斗特效
+  Dlg.hide();
+  $('#qpanel').classList.remove('show');
+  setHud(false);
+  buildMap();
+  showScreen('#scr-map');
+}
+function goTitle(){
+  G.token++;
+  G.state='title';
+  Snd.bgmStop();Dlg.hide();
+  setHud(false);$('#qpanel').classList.remove('show');
+  showScreen('#scr-title');
+}
+
+/* ---------------- 星图 ---------------- */
+function buildMap(){
+  const area=$('#map-area');
+  area.querySelectorAll('.node').forEach(n=>n.remove());
+  /* 航线：先画整条暗线，再画已解锁亮线 */
+  const svg=$('#map-svg');svg.innerHTML='';
+  const mk=(pts,cls)=>{
+    const p=document.createElementNS('http://www.w3.org/2000/svg','polyline');
+    p.setAttribute('points',pts.map(p=>p.join(',')).join(' '));
+    p.setAttribute('class',cls);
+    svg.appendChild(p);
+  };
+  mk(MAP_POS,'route-dim');
+  mk(MAP_POS.slice(0,G.save.unlocked),'route-on');
+  /* 星点节点 */
+  LEVELS.forEach((L,i)=>{
+    const n=document.createElement('button');
+    const locked=i>=G.save.unlocked;
+    n.className='node'+(locked?' locked':G.save.cleared[i]?' open done':' open')+(i===11?' bossnode':'');
+    n.style.left=MAP_POS[i][0]+'px';n.style.top=MAP_POS[i][1]+'px';
+    if(!locked){n.style.color=n.style.borderColor=L.color;n.title=L.theme;}
+    n.innerHTML=`<span>${i===11?'终':i+1}</span><span class="nm">${locked?'？？？':L.name}</span>`;
+    if(!locked)n.onclick=()=>{Snd.select();startLevel(i);};
+    area.appendChild(n);
+  });
+  const done=G.save.cleared.filter(Boolean).length;
+  const total=G.save.best.reduce((a,b)=>a+b,0);
+  $('#map-stat').innerHTML=`已通关 ${done}/12　累计得分 ${total}`;
+}
+
+/* ---------------- 渲染循环 ---------------- */
+let lastT=0;
+function loop(t){
+  const dt=Math.min(.05,(t-lastT)/1000||.016);
+  lastT=t;
+  update(dt,t/1000);
+  render(t/1000);
+  requestAnimationFrame(loop);
+}
+function update(dt,t){
+  /* 星空滚动 */
+  for(const s of stars){s.y+=s.sp*dt;if(s.y>H){s.y=-2;s.x=Math.random()*W;}}
+  /* 飞船横移 + 受击闪烁衰减 */
+  const sh=G.ship;
+  sh.x+=(sh.tx-sh.x)*Math.min(1,dt*9);
+  if(sh.flash>0)sh.flash=Math.max(0,sh.flash-dt*3);
+  /* 激光与能量弹：纯视觉飞行（命中结算已改由定时器驱动，见 resolveCorrect/resolveWrong） */
+  for(let i=G.lasers.length-1;i>=0;i--){
+    const l=G.lasers[i];
+    l.y+=l.vy*dt;
+    if(l.y<-30)G.lasers.splice(i,1);
+  }
+  for(let i=G.bolts.length-1;i>=0;i--){
+    const b=G.bolts[i];
+    b.x+=b.vx*dt;b.y+=b.vy*dt;
+    if(b.y>H+30)G.bolts.splice(i,1);
+  }
+  /* 逃走的怪兽 */
+  for(const m of G.monsters){
+    if(m.esc&&m.alive){
+      m.escT+=dt;m.y-=dt*(150+m.escT*420);
+      if(m.escT>.9)m.alive=false;
+    }
+    if(m.flash>0)m.flash=Math.max(0,m.flash-dt*2.5);
+  }
+  /* 粒子与飘字 */
+  for(let i=G.parts.length-1;i>=0;i--){
+    const p=G.parts[i];
+    p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt;
+    if(p.life<=0)G.parts.splice(i,1);
+  }
+  for(let i=G.floats.length-1;i>=0;i--){
+    const f=G.floats[i];
+    f.y-=42*dt;f.life-=dt*1.1;
+    if(f.life<=0)G.floats.splice(i,1);
+  }
+  if(G.shake>0)G.shake=Math.max(0,G.shake-dt*36);
+}
+/* 小C头像动画：用定时器驱动（无头环境/后台标签页也能刷新） */
+setInterval(()=>{
+  const t=performance.now()/1000;
+  if(G.state==='title')drawXC($('#xc-title'),t);
+  if(Dlg.active)drawXC($('#xc-dlg'),t);
+},120);
+
+function render(t){
+  ctx.save();
+  ctx.clearRect(0,0,W,H);
+  /* 屏幕震动 */
+  if(G.shake>0)ctx.translate(rnd(-G.shake,G.shake)*.6,rnd(-G.shake,G.shake)*.6);
+  drawBG(t);
+  drawStars();
+  const inGame=['intro','battle','feedback','summary'].includes(G.state);
+  if(inGame)drawMonsters(t);
+  if(inGame||G.state==='defeat')drawShip(t);
+  drawFX();
+  ctx.restore();
+}
+function drawBG(t){
+  ctx.fillStyle='#05060f';
+  ctx.fillRect(-20,-20,W+40,H+40);
+  /* 星云：按关卡色调渐变（非游戏画面用通用蓝紫） */
+  const inGame=['intro','battle','feedback','summary'].includes(G.state);
+  const col=inGame?LEVELS[G.li].color:'#2a5aff';
+  const g=ctx.createRadialGradient(W/2,-80,60,W/2,-80,620);
+  g.addColorStop(0,hexA(col,.16));
+  g.addColorStop(.55,hexA(col,.05));
+  g.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=g;ctx.fillRect(-20,-20,W+40,H+40);
+  if(inGame)drawPlanet();
+}
+/* 十六进制颜色 + 透明度 */
+function hexA(h,a){
+  const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+/* 背景装饰行星 */
+function drawPlanet(){
+  const L=G.li;
+  const px=130+(L*167)%700,py=90+(L*97)%160,pr=34+(L*13)%22;
+  ctx.fillStyle=hexA(LEVELS[G.li].color,.13);
+  ctx.beginPath();ctx.arc(px,py,pr,0,7);ctx.fill();
+  ctx.fillStyle='rgba(5,6,15,.55)';
+  ctx.beginPath();ctx.arc(px+pr*.32,py-pr*.1,pr*.92,0,7);ctx.fill();
+}
+function drawStars(){
+  for(const s of stars){
+    ctx.globalAlpha=s.l===0?.5:1;
+    ctx.fillStyle=s.c;
+    ctx.fillRect(s.x,s.y,s.r,s.r);
+  }
+  ctx.globalAlpha=1;
+}
+function drawMonsters(t){
+  const L=LEVELS[G.li];
+  G.monsters.forEach((m,i)=>{
+    if(!m.alive)return;
+    const bob=Math.sin(t*2.4+m.bob)*4;
+    const active=(G.state==='battle'&&!G.answered&&i===(isBoss()?0:G.qi));
+    let y=m.y+bob+(active?16:0);
+    let alpha=1;
+    if(m.esc)alpha=Math.max(0,1-m.escT/.9);
+    ctx.globalAlpha=alpha;
+    if(active){
+      ctx.save();
+      ctx.shadowColor=L.color;ctx.shadowBlur=22;
+      drawSprTo(ctx,m.spr,m.x-m.spr.w*m.sc/2,y-m.spr.h*m.sc/2,m.sc);
+      ctx.restore();
+    }else{
+      drawSprTo(ctx,m.spr,m.x-m.spr.w*m.sc/2,y-m.spr.h*m.sc/2,m.sc);
+    }
+    if(m.flash>0){
+      ctx.globalAlpha=m.flash*.8;
+      ctx.fillStyle='#ffffff';
+      ctx.fillRect(m.x-m.spr.w*m.sc/2,y-m.spr.h*m.sc/2,m.spr.w*m.sc,m.spr.h*m.sc);
+    }
+    ctx.globalAlpha=1;
+    /* Boss 血条（剩余题数刻度） */
+    if(m.isBoss){
+      const left=L.questions.length-G.qi;
+      const bw=left*16;
+      for(let k=0;k<left;k++){
+        ctx.fillStyle='#ff2030';
+        ctx.fillRect(m.x-bw/2+k*16,m.y+58,12,7);
+      }
+    }
+  });
+}
+function drawShip(t){
+  const sh=G.ship;
+  const bob=Math.sin(t*3)*3;
+  const x=sh.x-26,y=sh.y-20+bob;
+  /* 引擎尾焰（随机抖动的像素火焰） */
+  const fl=[18+rnd(0,10),34+rnd(0,10)];
+  fl.forEach((fx,idx)=>{
+    ctx.fillStyle=idx?'#ff9a3d':'#ffe14d';
+    ctx.fillRect(x+fx,y+40,4,rnd(6,14));
+  });
+  drawSprTo(ctx,SHIP,x,y,4);
+  /* 受击红闪 */
+  if(sh.flash>0){
+    ctx.globalAlpha=sh.flash*.65;
+    ctx.fillStyle='#ff3050';
+    ctx.fillRect(x,y,52,40);
+    ctx.globalAlpha=1;
+  }
+}
+function drawFX(){
+  /* 激光 */
+  for(const l of G.lasers){
+    ctx.fillStyle='#00f0ff';ctx.fillRect(l.x-2,l.y-16,4,18);
+    ctx.fillStyle='#ffffff';ctx.fillRect(l.x-1,l.y-12,2,12);
+  }
+  /* 怪兽能量弹 */
+  for(const b of G.bolts){
+    ctx.fillStyle='#c04dff';ctx.fillRect(b.x-3,b.y-3,6,6);
+    ctx.fillStyle='#ff6bd6';ctx.fillRect(b.x-1,b.y-8,2,6);
+  }
+  /* 爆炸粒子 */
+  for(const p of G.parts){
+    ctx.globalAlpha=Math.max(0,p.life/p.max);
+    ctx.fillStyle=p.c;
+    ctx.fillRect(p.x,p.y,p.s,p.s);
+  }
+  ctx.globalAlpha=1;
+  /* 得分飘字 */
+  ctx.font='9px "Press Start 2P",monospace';
+  ctx.textAlign='center';
+  for(const f of G.floats){
+    ctx.globalAlpha=Math.max(0,f.life);
+    ctx.fillStyle=f.c;
+    ctx.fillText(f.txt,f.x,f.y);
+  }
+  ctx.globalAlpha=1;ctx.textAlign='left';
+}
+
+/* ---------------- 输入 ---------------- */
+addEventListener('keydown',e=>{
+  Snd.ensure();
+  if(e.code==='KeyM'){toggleMute();return;}
+  if(e.code==='Escape'){
+    if(['battle','feedback','intro','summary'].includes(G.state))goMap();
+    return;
+  }
+  if(e.code==='Space'||e.code==='Enter'){
+    e.preventDefault();
+    if(G.state==='title'){Snd.select();goMap();return;}
+    if(Dlg.active){Dlg.advance();return;}
+  }
+  /* 数字键 1-4 选择答案（主键盘 + 小键盘） */
+  const map={Digit1:0,Digit2:1,Digit3:2,Digit4:3,Numpad1:0,Numpad2:1,Numpad3:2,Numpad4:3};
+  if(map[e.code]!==undefined&&G.state==='battle'&&!G.answered&&!Dlg.active){
+    answer(map[e.code]);
+  }
+});
+/* 点击推进对话 / 标题开始 */
+$('#dlg').addEventListener('click',()=>{Snd.ensure();Dlg.advance();});
+$('#stage').addEventListener('click',e=>{
+  Snd.ensure();
+  if(G.state==='title'&&!e.target.closest('button')){Snd.select();goMap();}
+  else if(Dlg.active&&e.target.closest('#dlg')==null&&e.target.closest('button')==null&&e.target.closest('.opt')==null)Dlg.advance();
+});
+function toggleMute(){
+  const m=Snd.toggleMute();
+  $('#mute-btn').textContent=m?'SND:OFF':'SND:ON';
+}
+$('#mute-btn').onclick=()=>{Snd.ensure();toggleMute();};
+$('#btn-title').onclick=()=>{Snd.select();goTitle();};
+$('#btn-reset').onclick=()=>{
+  if(confirm('确定要清空全部闯关进度吗？')){
+    localStorage.removeItem(SAVE_KEY);
+    G.save=loadSave();
+    buildMap();
+  }
+};
+
+/* ---------------- 启动 ---------------- */
+showScreen('#scr-title');
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

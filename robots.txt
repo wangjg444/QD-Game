@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://wangjg444.github.io/QD-Game/sitemap.xml
